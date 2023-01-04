@@ -1,9 +1,9 @@
-package org.jetbrains.plugins.template.listeners
+package com.github.jakobeha.intellijsmplcoccinelle.listeners
 
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManagerListener
-import org.jetbrains.plugins.template.services.MyProjectService
+import com.github.jakobeha.intellijsmplcoccinelle.services.MyProjectService
 
 internal class MyProjectManagerListener : ProjectManagerListener {
 

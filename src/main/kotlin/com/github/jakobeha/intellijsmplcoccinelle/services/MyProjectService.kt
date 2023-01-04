@@ -1,7 +1,7 @@
-package org.jetbrains.plugins.template.services
+package com.github.jakobeha.intellijsmplcoccinelle.services
 
 import com.intellij.openapi.project.Project
-import org.jetbrains.plugins.template.MyBundle
+import com.github.jakobeha.intellijsmplcoccinelle.MyBundle
 
 class MyProjectService(project: Project) {
 

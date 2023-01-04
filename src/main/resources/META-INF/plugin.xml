@@ -1,18 +1,34 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>com.github.jakobeha.intellijsmplcoccinelle</id>
-    <name>IntelliJ Platform Plugin intellij-smpl-coccinelle</name>
+    <!--suppress PluginXmlCapitalization -->
+    <name>Language Support for SmPL (coccinelle)</name>
     <vendor>jakobeha</vendor>
 
     <depends>com.intellij.modules.platform</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <applicationService serviceImplementation="com.github.jakobeha.intellijsmplcoccinelle.services.MyApplicationService"/>
-        <projectService serviceImplementation="com.github.jakobeha.intellijsmplcoccinelle.services.MyProjectService"/>
+        <!-- Language support -->
+        <fileType name="SmPL (coccinelle)" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.SmPLFileType"
+                  fieldName="INSTANCE" language="SmPL" extensions="cocci"/>
+        <lang.commenter language="SmPL"
+                        implementationClass="com.github.jakobeha.intellijsmplcoccinelle.SmPLCommenter" />
+        <completion.contributor language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.completion.SmPLKeywordCompletionContributor"/>
+        <lang.parserDefinition language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLParserDefinition" />
+        <editorHighlighterProvider filetype="SmPL (coccinelle)" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.highlight.SmPLEditorHighlighter$Provider" />
+        <lang.syntaxHighlighterFactory language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.highlight.SmPLSyntaxHighlighter$Factory" />
+
+        <!-- File Templates -->
+        <internalFileTemplate name="empty" />
+        <internalFileTemplate name="v1switch" />
+
+        <!-- Style -->
+        <colorSettingsPage implementation="com.github.jakobeha.intellijsmplcoccinelle.highlight.SmPLColorSettingsPage" />
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.jakobeha.intellijsmplcoccinelle.listeners.MyProjectManagerListener"
-                  topic="com.intellij.openapi.project.ProjectManagerListener"/>
-    </applicationListeners>
+    <actions>
+        <action class="com.github.jakobeha.intellijsmplcoccinelle.action.NewSmPLFileAction" id="SmPL.NewFile" text="SmPL File" description="Create new SmPL file">
+            <add-to-group group-id="NewGroup" anchor="before" relative-to-action="NewFromTemplate"/>
+        </action>
+    </actions>
 </idea-plugin>

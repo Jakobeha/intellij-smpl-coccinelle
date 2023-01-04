@@ -9,13 +9,15 @@ plugins {
     // Kotlin support
     id("org.jetbrains.kotlin.jvm") version "1.7.21"
     // Gradle IntelliJ Plugin
-    id("org.jetbrains.intellij") version "1.10.0"
+    id("org.jetbrains.intellij") version "1.11.0"
     // Gradle Changelog Plugin
     id("org.jetbrains.changelog") version "2.0.0"
     // Gradle Qodana Plugin
     id("org.jetbrains.qodana") version "0.1.13"
     // Gradle Kover Plugin
     id("org.jetbrains.kotlinx.kover") version "0.6.1"
+    // Antlr
+    antlr
 }
 
 group = properties("pluginGroup")
@@ -24,6 +26,21 @@ version = properties("pluginVersion")
 // Configure project's dependencies
 repositories {
     mavenCentral()
+}
+
+dependencies {
+    antlr("org.antlr:antlr4:4.11.1") {
+        exclude("com.ibm.icu", "icu4j")
+    }
+    implementation("org.antlr:antlr4-intellij-adaptor:0.1")
+    implementation("org.antlr:antlr4-runtime:4.11.1")
+}
+
+// See https://github.com/gradle/gradle/issues/820#issuecomment-288838412
+configurations {
+    compileClasspath {
+        setExtendsFrom(extendsFrom.filter { it != configurations.antlr })
+    }
 }
 
 // Set the JVM language level used to build project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.

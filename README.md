@@ -1,27 +1,25 @@
-# intellij-smpl-coccinelle
+# intellij-smpl-coccinelle: [SmPL (coccinelle)](https://coccinelle.gitlabpages.inria.fr/website) language support
 
 ![Build](https://github.com/Jakobeha/intellij-smpl-coccinelle/workflows/Build/badge.svg)
-[![Version](https://img.shields.io/jetbrains/plugin/v/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
-[![Downloads](https://img.shields.io/jetbrains/plugin/d/PLUGIN_ID.svg)](https://plugins.jetbrains.com/plugin/PLUGIN_ID)
+[![Checks](https://badgen.net/github/checks/Jakobeha/intellij-smpl-coccinelle/)](https://github.com/Jakobeha/intellij-smpl-coccinelle/actions)
+[![Version](https://img.shields.io/jetbrains/plugin/v/intellij-smpl-coccinelle.svg)](https://plugins.jetbrains.com/plugin/intellij-smpl-coccinelle)
+[![Downloads](https://img.shields.io/jetbrains/plugin/d/intellij-smpl-coccinelle.svg)](https://plugins.jetbrains.com/plugin/intellij-smpl-coccinelle)
+[![License: GPL3](https://badgen.net/github/license/Jakobeba/intellij-smpl-coccinelle?color=yellow)](LICENSE)
+![Dependabot: Active](https://badgen.net/github/dependabot/Jakobeha/intellij-smpl-coccinelle/)
+[![0.2.0](https://badgen.net/github/milestones/Jakobeha/intellij-smpl-coccinelle)](https://github.com/Jakobeha/intellij-smpl-coccinelle/milestone)
+
+<!-- Plugin description -->
+Language support for [SmPL](https://coccinelle.gitlabpages.inria.fr/website), the Semantic Patch Language, in IntelliJ-based IDEs:
+
+- Syntax Highlighting
+<!-- Plugin description end -->
 
 ## Template ToDo list
-- [x] Create a new [IntelliJ Platform Plugin Template][template] project.
-- [ ] Get familiar with the [template documentation][template].
-- [ ] Verify the [pluginGroup](./gradle.properties), [plugin ID](./src/main/resources/META-INF/plugin.xml) and [sources package](./src/main/kotlin).
-- [ ] Review the [Legal Agreements](https://plugins.jetbrains.com/docs/marketplace/legal-agreements.html?from=IJPluginTemplate).
 - [ ] [Publish a plugin manually](https://plugins.jetbrains.com/docs/intellij/publishing-plugin.html?from=IJPluginTemplate) for the first time.
 - [ ] Set the Plugin ID in the above README badges.
 - [ ] Set the [Plugin Signing](https://plugins.jetbrains.com/docs/intellij/plugin-signing.html?from=IJPluginTemplate) related [secrets](https://github.com/JetBrains/intellij-platform-plugin-template#environment-variables).
 - [ ] Set the [Deployment Token](https://plugins.jetbrains.com/docs/marketplace/plugin-upload.html?from=IJPluginTemplate).
 - [ ] Click the <kbd>Watch</kbd> button on the top of the [IntelliJ Platform Plugin Template][template] to be notified about releases containing new features and fixes.
-
-<!-- Plugin description -->
-This Fancy IntelliJ Platform Plugin is going to be your implementation of the brilliant ideas that you have.
-
-This specific section is a source for the [plugin.xml](/src/main/resources/META-INF/plugin.xml) file which will be extracted by the [Gradle](/build.gradle.kts) during the build process.
-
-To keep everything working, do not remove `<!-- ... -->` sections. 
-<!-- Plugin description end -->
 
 ## Installation
 
@@ -38,5 +36,9 @@ To keep everything working, do not remove `<!-- ... -->` sections.
 
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
+
+Also code used from [IntelliJ P4 Plugin](https://github.com/Yi-Tseng/IntelliJ-P4-Plugin)
+
+Icon: [Tux Paint, GPL <http://www.gnu.org/licenses/gpl.html>, via Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tux_Paint_ladybug.svg)
 
 [template]: https://github.com/JetBrains/intellij-platform-plugin-template

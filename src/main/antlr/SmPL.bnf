@@ -1,13 +1,34 @@
 /// SPEC: https://coccinelle.gitlabpages.inria.fr/website/docs/main_grammar.html
 {
+    parserClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLParser"
+    parserUtilClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLParserUtilBase"
+
+    implements="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLCompositeElement"
+    extends="com.github.jakobeha.intellijsmplcoccinelle.psi.impl.SmPLCompositeElementImpl"
+
+    psiClassPrefix="SmPL"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.github.jakobeha.intellijsmplcoccinelle.psi"
+    psiImplPackage="com.github.jakobeha.intellijsmplcoccinelle.psi.impl"
+
+    elementTypeHolderClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLTypes"
+    elementTypeClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLElementType"
+    tokenTypeClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLTokenType"
+
+    generate=[tokenAccessors="yes"]
+
     tokens = [
-        DIGITS = 'regexp:[0-9]+',
+        DIGITS = 'regexp:[0-9]+'
         WORD = 'regexp:[a-zA-Z_][a-zA-Z0-9_]*'
         VARIABLE = 'regexp:(?<!^)(@)[\\w]+'
         WHITE_SPACE = 'regexp:\s+'
         STRING = 'regexp:"[^"]*"'
         // REGEXP = 'regexp:"[^"]*"'
         SYS_PATH = 'regexp:<[^>]*>'
+        SCRIPT_LINE = 'regexp:^=[^\r\n]*'
+        INSERT_LINE = 'regexp:^\+[^\r\n]*'
+        DELETE_LINE = 'regexp:^-[^\r\n]*'
+        STAR_LINE = 'regexp:^\*[^\r\n]*'
     ]
 }
 
@@ -17,7 +38,7 @@ include_cocci ::=
     '#include' STRING |
     'using' STRING |
     'using' SYS_PATH |
-    'virtual' COMMA_LIST(WORD)
+    'virtual' <<commaSeparate WORD>>
 
 changeset ::=
     metavariables transformation |
@@ -25,127 +46,108 @@ changeset ::=
 
 metavariables ::=
     '@@' metadecl* '@@' |
-    '@' rulename '@' metadecl * '@@' |
+    '@' rulename '@' metadecl * '@@'
 rulename ::=
-    id ('extends' id)? ('depends on' (exists)? dep)? (iso)? (disable-iso)? (exists)? (rulekind)?
+    id  ['extends' id] ruleattr*
+ruleattr ::=
+    'depends' 'on' [exists] dep |
+    'using' <<commaSeparate STRING>> |
+    'disable' <<commaSeparate id>> |
+    exists |
+    rulekind
 dep ::=
+    dep_ '&&' dep |
+    dep_ '||' dep |
+    dep_
+dep_ ::=
     id |
     '!' id |
     '!(' dep ')' |
     'ever' id |
     'never' id |
-    dep '&&' dep |
-    dep '||' dep |
-    'file in' string |
+    'file' 'in' string |
     '(' dep ')'
-iso ::= 'using' COMMA_LIST(STRING)
-disable-iso  ::= disable COMMA_LIST(id)
-exists ::=
+private exists ::=
     'exists' |
     'forall'
-rulekind ::=
+private rulekind ::=
     'expression' |
     'identifier' |
     'type'
 
  metadecl ::=
+    'attribute' ids ';' |
+     ('attribute' | 'declarer' | 'iterator') 'name' ids ';' |
+     ('symbol' | 'typedef') pmids ';' |
      'fresh' 'identifier' pmids_with_seed ';' |
-     'metavariable' pmids_with_constraints ';' |
-     'identifier' pmvids_with_constraints ';' |
-     'identifier' list pmvids_with_constraints ';' |
-     'field' (list)? pmids_with_constraints ';' |
-     'parameter' (list)? pmids_with_constraints ';' |
-     'type' pmids_with_constraints ';' |
-     'statement' (list)? pmids_with_constraints ';' |
-     'declaration' pmids_with_constraints ';' |
-     'initialiser' (list)? pmids_with_constraints ';' |
-     'initializer' (list)? pmids_with_constraints ';' |
-     idexpression '*'* pmids_with_constraints ';' |
-     idexpression ctype pmids_with_constraints ';' |
-     idexpression '{' ctypes '}' '*'* pmids_with_constraints ';' |
-     'expression' list pmids_with_constraints ';' |
-     expression_enum_struct_union '*'* pmids_with_constraints ';' |
-     ctype ('[' ']')? pmids_with_constraints ';' |
-     '{' ctypes '}' '*'* ('[' ']')? pmids_with_constraints ';' |
-     'constant' pmids_with_constraints ';' |
-     'constant' ctype pmids_with_constraints ';' |
-     'constant' '{' ctypes '}' '*'* pmids_with_constraints ';' |
-     'format' (list)? pmids_with_constraints';' |
-     'assignment' 'operator' COMMA_LIST(assignopdecl) ';' |
-     'binary' 'operator' COMMA_LIST(binopdecl) ';' |
-     'unary' 'operator' COMMA_LIST(unopdecl) ';' |
-     'position' ('any')? pmids_with_constraints ';' |
-     'symbol' pmids ';' |
-     'typedef' pmids ';' |
-     'attribute' name ids ';' |
-     'attribute' ids ';' |
-     'declarer' 'name' ids ';' |
-     'declarer' pmids_with_constraints ';' |
-     'iterator' 'name' ids ';' |
-     'iterator' pmids_with_constraints ';'
-idexpression ::=
-    'local' 'idexpression' |
-    'global' 'idexpression' |
-    'idexpression'
-expression_enum_struct_union ::=
-    'expression' 'enum' |
-    'expression' 'struct' |
-    'expression' 'union'
-list ::=
-    'list' |
-    'list' '[' id ']' |
-    'list' '[' integer ']'
-assignopdecl ::= pmid ('=' assignop_constraint)?
-assignop_constraint ::= '{' COMMA_LIST(assign_op) '}' | assign_op
-binopdecl ::= pmid ('=' binop_constraint)?
-binop_constraint ::= '{' COMMA_LIST(bin_op) '}' | bin_op
-unopdecl ::= pmid ('=' unop_constraint)?
-unop_constraint ::= '{' COMMA_LIST(unary_op) '}' | unary_op
+     ('metavariable' | 'type' | 'declaration' | 'position' 'any'? | 'declarer' | 'iterator') pmids_with_constraints ';' |
+     ('identifier' | 'field' | 'parameter' | 'statement' | 'initializer' | 'format') [list] pmids_with_constraints ';' |
+      ['local' | 'global'] 'idexpression'  [ctype_or_types | '*'+] pmids_with_constraints ';' |
+     'expression'  [list | ('enum' | 'struct' | 'union') '*'*] pmids_with_constraints ';' |
+     ctype_or_types  ['[' ']'] pmids_with_constraints ';' |
+     'constant' [ctype_or_types] pmids_with_constraints ';' |
+     'assignment' 'operator' <<commaSeparate assignopdecl>> ';' |
+     'binary' 'operator' <<commaSeparate binopdecl>> ';' |
+     'unary' 'operator' <<commaSeparate unopdecl>> ';' |
+private ctype_or_types ::=
+    CTYPE |
+    '{' <<commaSeparate CTYPE>> '}' '*'*
+list ::= 'list'  ['[' (id | DIGITS) ']']
+assignopdecl ::= pmid  ['=' assignop_constraint]
+assignop_constraint ::= '{' <<commaSeparate assign_op>> '}' | assign_op
+binopdecl ::= pmid  ['=' binop_constraint]
+binop_constraint ::= '{' <<commaSeparate bin_op>> '}' | bin_op
+unopdecl ::= pmid  ['=' unop_constraint]
+unop_constraint ::= '{' <<commaSeparate unary_op>> '}' | unary_op
 
-ids ::= COMMA_LIST(id)
-pmids ::= COMMA_LIST(pmid)
-pmids_with_constraints ::= COMMA_LIST(pmid (constraints)?)
-pmvids_with_constraints ::= COMMA_LIST(pmvid (constraints)?)
-pmids_with_seed ::= COMMA_LIST(pmid (seed)?)
-pmvid ::= pmid | 'virtual' '.' id
-pmid  ::= id | mid
-mid ::= rulename_id '.' id
-constraints ::= ANDAND_LIST(constraint)
+assign_op ::= '=' | '-=' | '+=' | '*=' | '/=' | '%=' | '<<=' | '>>=' | '&=' | '^=' | '|='
+bin_op ::= '+' | '-' | '*' | '/' | '%' | '<<' | '>>' | '<' | '<=' | '>' | '>=' | '==' | '!=' | '&' | '^' | '|' | '&&' | '||'
+unary_op ::= '+' | '-' | '!' | '~' | '++' | '--' | '&' | '*'
+
+ids ::= <<commaSeparate id>>
+pmids ::= <<commaSeparate pmid>>
+pmids_with_constraints ::= <<commaSeparate (pmid [constraints])>>
+pmids_with_seed ::= <<commaSeparate (pmid [seed])>>
+pmid ::= id  ['.' id]
+constraints ::= constraint ('&&' constraint)*
 constraint ::=
     compare_constraint |
     regexp_constraint |
     ':' script
 compare_constraint  ::= id_compare_constraint | int_compare_constraint
 id_compare_constraint ::=
-    '=' pmid |
-    '=' '{' COMMA_LIST(pmid) '}' |
-    '!=' pmid |
-    '!=' '{' COMMA_LIST(pmid) '}'
+    ('=' | '!=') (pmid | '{' <<commaSeparate pmid>> '}')
 int_compare_constraint  ::=
-    '=' integer |
-    '=' '{' COMMA_LIST(integer) '}' |
-    '!=' integer |
-    '!=' '{' COMMA_LIST(integer) '}'
-regexp_constraint ::= '=~' STRING | '!~' STRING
+    ('=' | '!=') (INTEGER | '{' <<commaSeparate INTEGER>> '}')
+regexp_constraint ::= ('=~' | '!~') STRING
 seed ::=
     '=' string |
-    '=' CONCAT_LIST(string '|' pmid) |
+    '=' string '|' pmid ('##' string '|' pmid)* |
     '=' script
 script ::=
-    'script:ocaml' '(' COMMA_LIST(mid) ')' '{' expr '}' |
-    'script:python' '(' COMMA_LIST(mid) ')' '{' expr '}'
+    'script' ':' language '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}'
 
-const ::= STRING | DIGITS | '...'
-id ::= ID | METAID_ID | OR(id) | AND(id)
-typedef_ident ::= id | METAID_TYPE
-type ::= ctype | METAID_TYPE
+script_metavariables ::=
+    '@' ('script' | 'initialize' | 'finalize') ':' language [rulename] ['depends' 'on' dep] '@' script_metadecl* '@@'
+private language ::= 'python' | 'ocaml'
+script_metadecl ::=
+    (id | '(' id ',' id ')') ['<<' id '.' id ['=' (STRING | '[' ']')]] ';'
+id ::=
+    WORD |
+    '(' id ')' |
+    '(' id ('|' id)+ ')' |
+    '(' id ('&' id)+ ')'
 
-COMMA_LIST(X) ::= X | X ',' COMMA_LIST(X)
-ANDAND_LIST(X) ::= X | X '&&' ANDAND_LIST(X)
-CONCAT_LIST(X) ::= X | X '##' CONCAT_LIST(X)
-OR(gram_o) ::= '(' gram_o ('|' gram_o)* ')'
-AND(gram_o) ::= '(' gram_o ('&' gram_o)* ')'
-DOTSEQ(gram_d, when_d) ::= '...' (when_d)? (gram_d '...' (when_d)?)*
-NEST(gram_n, when_n) ::=
-    '<' '...' (when_n)? gram_n ('...' (when_n)? gram_n) * '...' '>' |
-    '<+' '...' (when_n)? gram_n ('...' (when_n)? gram_n) * '...' '+>'
+script_code ::=
+    SCRIPT_LINE+
+
+transformation ::=
+    transformation_line+
+
+transformation_line ::=
+    SCRIPT_LINE |
+    INSERT_LINE |
+    DELETE_LINE |
+    STAR_LINE
+
+private meta commaSeparate ::= <<p>> (',' <<p>>)* {pin(".*")=1}

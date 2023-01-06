@@ -23,7 +23,7 @@
     tokens = [
         // Punctuation
         at='@'
-        double_at'@@'
+        double_at='@@'
         not='!'
         and='&'
         or='|'
@@ -101,13 +101,13 @@
         INITIALIZE="initialize"
         FINALIZE="finalize"
         // Not quite reserved: built-in names for disable-iso
-        OPTIONAL_STORAGE="optional_storage"
-        OPTIONAL_QUALIFIER="optional_qualifier"
-        OPTIONAL_ATTRIBUTES="optional_attributes"
-        VALUE_FORMAT="value_format"
-        OPTIONAL_DECLARER_SEMICOLON="optional_declarer_semicolon"
-        COMM_ASSOC="comm_assoc"
-        PROTOTYPES="prototypes"
+        // OPTIONAL_STORAGE="optional_storage"
+        // OPTIONAL_QUALIFIER="optional_qualifier"
+        // OPTIONAL_ATTRIBUTES="optional_attributes"
+        // VALUE_FORMAT="value_format"
+        // OPTIONAL_DECLARER_SEMICOLON="optional_declarer_semicolon"
+        // COMM_ASSOC="comm_assoc"
+        // PROTOTYPES="prototypes"
         // Literals
         digits = 'regexp:[0-9]+'
         word = 'regexp:[a-zA-Z_][a-zA-Z0-9_]*'
@@ -116,8 +116,9 @@
         // Dummy required for the live preview for some reason (grammar isn't whitespace-sensitive)
         white_space = 'regexp:\s+'
         // These are actually inferred from lines between the regexps `^@@$` and `^@`
-        SCRIPT_LINE = 'regexp:\n;[^\r\n]*'
-        TRANSFORMATION_LINE = 'regexp:\n:[^\r\n]*'
+        TRANSFORMATION_BLOCK = 'regexp:$a'
+        OCAML_BLOCK = 'regexp:$a*'
+        PYTHON_BLOCK = 'regexp:$a*'
         // Inferred some other way
         ctype='CTYPE'
         expr='EXPR'
@@ -344,10 +345,7 @@ d_ident ::= id ['[' expr ']'] '*'
 fn_ctype ::= (generic_ctype | 'void') '*'*
 name_opt_decl ::= decl | ctype | fn_ctype*/
 
-script_body ::=
-    SCRIPT_LINE+
-
-transformation_body ::=
-    TRANSFORMATION_LINE+
+script_body ::= OCAML_BLOCK | PYTHON_BLOCK
+transformation_body ::= TRANSFORMATION_BLOCK
 
 private meta commaSeparate ::= <<p>> (',' <<p>>)* {pin(".*")=1}

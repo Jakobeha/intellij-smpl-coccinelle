@@ -14,9 +14,12 @@
         <lang.commenter language="SmPL"
                         implementationClass="com.github.jakobeha.intellijsmplcoccinelle.SmPLCommenter" />
         <completion.contributor language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.completion.SmPLKeywordCompletionContributor"/>
-        <lang.parserDefinition language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLParserDefinition" />
+        <lang.parserDefinition language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.parsing.SmPLParserDefinition" />
         <editorHighlighterProvider filetype="SmPL (coccinelle)" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.highlight.SmPLEditorHighlighter$Provider" />
         <lang.syntaxHighlighterFactory language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.highlight.SmPLSyntaxHighlighter$Factory" />
+
+        <!-- Language inject (C) -->
+        <multiHostInjector implementation="com.github.jakobeha.intellijsmplcoccinelle.injection.SmPLMultiHostInjector"/>
 
         <!-- File Templates -->
         <internalFileTemplate name="empty" />

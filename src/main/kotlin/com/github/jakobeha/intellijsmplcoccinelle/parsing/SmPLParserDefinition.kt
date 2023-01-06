@@ -1,8 +1,8 @@
-package com.github.jakobeha.intellijsmplcoccinelle.psi
+package com.github.jakobeha.intellijsmplcoccinelle.parsing
 
 import com.github.jakobeha.intellijsmplcoccinelle.SmPL
-import com.github.jakobeha.intellijsmplcoccinelle.parsing.SmPLLexer
-import com.github.jakobeha.intellijsmplcoccinelle.parsing.SmPLParser
+import com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLFile
+import com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLTokenType
 import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
@@ -15,11 +15,6 @@ import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IElementType
 import com.intellij.psi.tree.IFileElementType
 import com.intellij.psi.tree.TokenSet
-import org.antlr.intellij.adaptor.lexer.ANTLRLexerAdaptor
-import org.antlr.intellij.adaptor.lexer.PSIElementTypeFactory
-import org.antlr.intellij.adaptor.parser.ANTLRParserAdaptor
-import org.antlr.v4.runtime.Parser
-import org.antlr.v4.runtime.tree.ParseTree
 
 
 class SmPLParserDefinition : ParserDefinition {
@@ -31,25 +26,9 @@ class SmPLParserDefinition : ParserDefinition {
         )
     }
 
-    override fun createLexer(project: Project): Lexer {
-        return object : ANTLRLexerAdaptor(SmPL, SmPLLexer(null)) {
-            override fun advance() {
-                // TODO: Process preprocessor token(collect define, include files, macros...)
-                super.advance()
-            }
-        }
-    }
+    override fun createLexer(project: Project): Lexer = SmPLLexer(project)
 
-    override fun createParser(project: Project): PsiParser {
-        val parser = SmPLParser(null)
-        // parser.addErrorListener(); // To collect error
-        // parser.addParseListener(new SmPLParserListener()); // To collect symbols(tables, fields...)
-        return object : ANTLRParserAdaptor(SmPL, parser) {
-            override fun parse(parser: Parser, root: IElementType): ParseTree {
-                return (parser as SmPLParser).start()
-            }
-        }
-    }
+    override fun createParser(project: Project): PsiParser = SmPLParser(project)
 
     override fun getFileNodeType(): IFileElementType {
         return FILE

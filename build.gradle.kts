@@ -61,6 +61,18 @@ kover.xmlReport {
 }
 
 tasks {
+    task("runJFlex", Exec::class) {
+        commandLine("./tools/run-jflex")
+    }
+
+    task("cleanJFlex", Exec::class) {
+        commandLine("./tools/run-jflex", "clean")
+    }
+
+    assemble {
+        dependsOn("runJFlex")
+    }
+
     wrapper {
         gradleVersion = properties("gradleVersion")
     }

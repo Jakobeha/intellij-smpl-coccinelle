@@ -24,16 +24,8 @@ class SmPLParserDefinition : ParserDefinition {
 
     override fun getFileNodeType(): IFileElementType = FILE
 
-    override fun getCommentTokens(): TokenSet = TokenSet.create(
-        SmPLTypes.DOC_COMMENT,
-        SmPLTypes.BLOCK_COMMENT,
-        SmPLTypes.LINE_COMMENT
-    )
-
-    override fun getStringLiteralElements(): TokenSet = TokenSet.create(
-        SmPLTypes.STRING,
-        SmPLTypes.SYSPATH
-    )
+    override fun getCommentTokens(): TokenSet = COMMENTS
+    override fun getStringLiteralElements(): TokenSet = STRING_LITERALS
 
     override fun createElement(node: ASTNode): PsiElement {
         return ASTWrapperPsiElement(node)
@@ -58,5 +50,17 @@ class SmPLParserDefinition : ParserDefinition {
 
     companion object {
         private val FILE = IFileElementType(SmPL)
+
+        val COMMENTS: TokenSet = TokenSet.create(
+            SmPLTypes.DOC_COMMENT,
+            SmPLTypes.BLOCK_COMMENT,
+            SmPLTypes.LINE_COMMENT
+        )
+
+        val STRING_LITERALS: TokenSet = TokenSet.create(
+            SmPLTypes.STRING,
+            SmPLTypes.SYSPATH
+        )
+
     }
 }

@@ -5,12 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmPLScriptConstraint extends SmPLCompositeElement {
-
-  @Nullable
-  SmPLScriptInline getScriptInline();
-
-  @NotNull
-  PsiElement getColon();
+public interface SmPLScriptLang extends SmPLCompositeElement {
 
 }

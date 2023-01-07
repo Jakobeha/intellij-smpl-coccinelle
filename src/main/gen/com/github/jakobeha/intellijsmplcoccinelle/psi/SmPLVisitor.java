@@ -194,10 +194,6 @@ public class SmPLVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
-  public void visitScript(@NotNull SmPLScript o) {
-    visitCompositeElement(o);
-  }
-
   public void visitScriptBody(@NotNull SmPLScriptBody o) {
     visitCodeBody(o);
   }
@@ -207,6 +203,14 @@ public class SmPLVisitor extends PsiElementVisitor {
   }
 
   public void visitScriptConstraint(@NotNull SmPLScriptConstraint o) {
+    visitCompositeElement(o);
+  }
+
+  public void visitScriptInline(@NotNull SmPLScriptInline o) {
+    visitCompositeElement(o);
+  }
+
+  public void visitScriptLang(@NotNull SmPLScriptLang o) {
     visitCompositeElement(o);
   }
 

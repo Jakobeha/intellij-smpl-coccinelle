@@ -5,10 +5,13 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmPLScript extends SmPLCompositeElement {
+public interface SmPLScriptInline extends SmPLCompositeElement {
 
   @NotNull
   List<SmPLId> getIdList();
+
+  @Nullable
+  SmPLScriptLang getScriptLang();
 
   @NotNull
   PsiElement getScript();

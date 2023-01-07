@@ -598,10 +598,10 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   /* ********************************************************** */
   // id |
   //     '!' id |
-  //     '!(' dep ')' |
+  //     '!' '(' dep ')' |
   //     'ever' id |
   //     'never' id |
-  //     'file' 'in' string |
+  //     'file in' string |
   //     '(' dep ')'
   public static boolean dep_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "dep_")) return false;
@@ -612,7 +612,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     if (!r) r = dep__2(b, l + 1);
     if (!r) r = dep__3(b, l + 1);
     if (!r) r = dep__4(b, l + 1);
-    if (!r) r = dep__5(b, l + 1);
+    if (!r) r = parseTokens(b, 1, FILE_IN, STRING);
     if (!r) r = dep__6(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -630,12 +630,12 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  // '!(' dep ')'
+  // '!' '(' dep ')'
   private static boolean dep__2(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "dep__2")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_);
-    r = consumeToken(b, "!(");
+    r = consumeTokens(b, 1, NOT, LPAREN);
     p = r; // pin = 1
     r = r && report_error_(b, dep(b, l + 1));
     r = p && consumeToken(b, RPAREN) && r;
@@ -663,19 +663,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     r = consumeToken(b, NEVER);
     p = r; // pin = 1
     r = r && id(b, l + 1);
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  // 'file' 'in' string
-  private static boolean dep__5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "dep__5")) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_);
-    r = consumeToken(b, "file");
-    p = r; // pin = 1
-    r = r && report_error_(b, consumeToken(b, "in"));
-    r = p && consumeToken(b, STRING) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
@@ -1219,7 +1206,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ('=' | '!=') (INTEGER | '{' <<commaSeparate INTEGER>> '}')
+  // ('=' | '!=') (integer | '{' <<commaSeparate integer>> '}')
   public static boolean int_compare_constraint(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "int_compare_constraint")) return false;
     if (!nextTokenIs(b, "<int compare constraint>", EQUALS, NOT_EQUALS)) return false;
@@ -1240,24 +1227,24 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // INTEGER | '{' <<commaSeparate INTEGER>> '}'
+  // integer | '{' <<commaSeparate integer>> '}'
   private static boolean int_compare_constraint_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "int_compare_constraint_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, INTEGER);
+    r = integer(b, l + 1);
     if (!r) r = int_compare_constraint_1_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // '{' <<commaSeparate INTEGER>> '}'
+  // '{' <<commaSeparate integer>> '}'
   private static boolean int_compare_constraint_1_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "int_compare_constraint_1_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, LBRACE);
-    r = r && commaSeparate(b, l + 1, INTEGER_parser_);
+    r = r && commaSeparate(b, l + 1, SmPLParser::integer);
     r = r && consumeToken(b, RBRACE);
     exit_section_(b, m, null, r);
     return r;
@@ -1312,16 +1299,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     r = r && ids(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
-  }
-
-  /* ********************************************************** */
-  // 'python' | 'ocaml'
-  static boolean language(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "language")) return false;
-    boolean r;
-    r = consumeToken(b, "python");
-    if (!r) r = consumeToken(b, "ocaml");
-    return r;
   }
 
   /* ********************************************************** */
@@ -1848,35 +1825,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'script' ':' language '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}'
-  public static boolean script(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "script")) return false;
-    if (!nextTokenIs(b, SCRIPT)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, SCRIPT, null);
-    r = consumeTokens(b, 2, SCRIPT, COLON);
-    p = r; // pin = 2
-    r = r && report_error_(b, language(b, l + 1));
-    r = p && report_error_(b, consumeToken(b, LPAREN)) && r;
-    r = p && report_error_(b, commaSeparate(b, l + 1, SmPLParser::script_4_0)) && r;
-    r = p && report_error_(b, consumeTokens(b, -1, RPAREN, LBRACE, EXPR, RBRACE)) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  // id '.' id
-  private static boolean script_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "script_4_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = id(b, l + 1);
-    r = r && consumeToken(b, DOT);
-    r = r && id(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  /* ********************************************************** */
   // OCAML_BLOCK | PYTHON_BLOCK
   public static boolean script_body(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_body")) return false;
@@ -1903,7 +1851,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ':' script
+  // ':' script_inline
   public static boolean script_constraint(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_constraint")) return false;
     if (!nextTokenIs(b, COLON)) return false;
@@ -1911,9 +1859,50 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, SCRIPT_CONSTRAINT, null);
     r = consumeToken(b, COLON);
     p = r; // pin = 1
-    r = r && script(b, l + 1);
+    r = r && script_inline(b, l + 1);
     exit_section_(b, l, m, r, p, null);
     return r || p;
+  }
+
+  /* ********************************************************** */
+  // 'script' ':' script_lang '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}'
+  public static boolean script_inline(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "script_inline")) return false;
+    if (!nextTokenIs(b, SCRIPT)) return false;
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, SCRIPT_INLINE, null);
+    r = consumeTokens(b, 2, SCRIPT, COLON);
+    p = r; // pin = 2
+    r = r && report_error_(b, script_lang(b, l + 1));
+    r = p && report_error_(b, consumeToken(b, LPAREN)) && r;
+    r = p && report_error_(b, commaSeparate(b, l + 1, SmPLParser::script_inline_4_0)) && r;
+    r = p && report_error_(b, consumeTokens(b, -1, RPAREN, LBRACE, EXPR, RBRACE)) && r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
+  }
+
+  // id '.' id
+  private static boolean script_inline_4_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "script_inline_4_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = id(b, l + 1);
+    r = r && consumeToken(b, DOT);
+    r = r && id(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // 'python' | 'ocaml'
+  public static boolean script_lang(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "script_lang")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, SCRIPT_LANG, "<script lang>");
+    r = consumeToken(b, "python");
+    if (!r) r = consumeToken(b, "ocaml");
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   /* ********************************************************** */
@@ -2046,7 +2035,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '@' ('script' | 'initialize' | 'finalize') ':' language [rulename] ['depends' 'on' dep] '@' script_metadecl* '@@'
+  // '@' ('script' | 'initialize' | 'finalize') ':' script_lang [rulename] ['depends' 'on' dep] '@' script_metadecl* '@@'
   public static boolean script_metavariables(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_metavariables")) return false;
     boolean r, p;
@@ -2055,7 +2044,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     r = r && script_metavariables_1(b, l + 1);
     p = r; // pin = 2
     r = r && report_error_(b, consumeToken(b, COLON));
-    r = p && report_error_(b, language(b, l + 1)) && r;
+    r = p && report_error_(b, script_lang(b, l + 1)) && r;
     r = p && report_error_(b, script_metavariables_4(b, l + 1)) && r;
     r = p && report_error_(b, script_metavariables_5(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, AT)) && r;
@@ -2134,7 +2123,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // '=' string_seed |
-  //     '=' script
+  //     '=' script_inline
   public static boolean seed(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "seed")) return false;
     if (!nextTokenIs(b, EQUALS)) return false;
@@ -2157,13 +2146,13 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '=' script
+  // '=' script_inline
   private static boolean seed_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "seed_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, EQUALS);
-    r = r && script(b, l + 1);
+    r = r && script_inline(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
@@ -2451,7 +2440,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   static final Parser CTYPE_parser_ = (b, l) -> consumeToken(b, CTYPE);
-  static final Parser INTEGER_parser_ = (b, l) -> consumeToken(b, INTEGER);
   static final Parser STRING_parser_ = (b, l) -> consumeToken(b, STRING);
   static final Parser WORD_parser_ = (b, l) -> consumeToken(b, WORD);
 }

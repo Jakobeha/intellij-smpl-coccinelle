@@ -39,6 +39,12 @@ public class SmPLScriptMetavariablesImpl extends SmPLCompositeElementImpl implem
   }
 
   @Override
+  @Nullable
+  public SmPLScriptLang getScriptLang() {
+    return findChildByClass(SmPLScriptLang.class);
+  }
+
+  @Override
   @NotNull
   public List<SmPLScriptMetadecl> getScriptMetadeclList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmPLScriptMetadecl.class);

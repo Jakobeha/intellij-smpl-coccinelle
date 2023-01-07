@@ -27,6 +27,12 @@ public class SmPLIntCompareConstraintImpl extends SmPLCompositeElementImpl imple
   }
 
   @Override
+  @NotNull
+  public List<SmPLInteger> getIntegerList() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmPLInteger.class);
+  }
+
+  @Override
   @Nullable
   public PsiElement getEquals() {
     return findChildByType(EQUALS);

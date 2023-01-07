@@ -12,7 +12,7 @@ import com.github.jakobeha.intellijsmplcoccinelle.psi.*;
 
 public class SmPLScriptBodyImpl extends SmPLCodeBodyBase implements SmPLScriptBody {
 
-  public SmPLScriptBodyImpl(ASTNode node) {
+  public SmPLScriptBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

@@ -28,8 +28,8 @@ public class SmPLScriptConstraintImpl extends SmPLCompositeElementImpl implement
 
   @Override
   @Nullable
-  public SmPLScript getScript() {
-    return findChildByClass(SmPLScript.class);
+  public SmPLScriptInline getScriptInline() {
+    return findChildByClass(SmPLScriptInline.class);
   }
 
   @Override

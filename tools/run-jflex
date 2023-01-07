@@ -18,7 +18,7 @@ usage() {
 
 # Names without extensions, this way we can add .java or .flex as needed.
 names=(
-src/main/kotlin/com/github/jakobeha/intellijsmplcoccinelle/parsing/_SmPLLexer
+src/main/java/com/github/jakobeha/intellijsmplcoccinelle/parsing/_SmPLLexer
 )
 
 main() {
@@ -29,14 +29,14 @@ main() {
         --help|-h) usage; exit;;
         clean) do_clean; exit;;
         *)
-          >&2 "Unexpected arguments: $@"
+          >&2 "Unexpected arguments: $*"
           >&2 usage
           exit 1
           ;;
       esac
       ;;
     *)
-      >&2 echo "Unexpected arguments: $@"
+      >&2 echo "Unexpected arguments: $*"
       >&2 usage
       exit 1
       ;;

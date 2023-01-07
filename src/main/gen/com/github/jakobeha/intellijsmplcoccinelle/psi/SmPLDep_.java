@@ -17,6 +17,9 @@ public interface SmPLDep_ extends SmPLCompositeElement {
   PsiElement getEver();
 
   @Nullable
+  PsiElement getFileIn();
+
+  @Nullable
   PsiElement getNever();
 
   @Nullable

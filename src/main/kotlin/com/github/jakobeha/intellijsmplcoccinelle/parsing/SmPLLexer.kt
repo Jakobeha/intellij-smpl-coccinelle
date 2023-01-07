@@ -14,7 +14,7 @@ import com.intellij.psi.tree.IElementType
  * The rest is lexed into a single TRANSFORMATION or SCRIPT token, which will be handed off to the corresponding
  * language via [com.intellij.lang.injection.MultiHostInjector]
  */
-class SmPLLexer(): FlexAdapter(_SmPLLexer(null)) {
+class SmPLLexer: FlexAdapter(_SmPLLexer(null)) {
     private enum class Mode {
         /** We are before or in an import header, or right before a metadecl (at the `@`) */
         Import,
@@ -48,7 +48,7 @@ class SmPLLexer(): FlexAdapter(_SmPLLexer(null)) {
     }
 
     override fun getTokenType(): IElementType? = when (this.mode) {
-        Mode.BeforeCode -> this.codeLang.elementType
+        Mode.AfterCode -> this.codeLang.elementType
         else -> super.getTokenType()
     }
 
@@ -60,7 +60,7 @@ class SmPLLexer(): FlexAdapter(_SmPLLexer(null)) {
     override fun getTokenEnd(): Int = when (this.mode) {
         // See advanceCode definition, we set lexer to start at code end
         Mode.AfterCode -> this.flex.tokenStart
-        else -> super.getTokenStart()
+        else -> super.getTokenEnd()
     }
 
     override fun start(buffer: CharSequence, startOffset: Int, endOffset: Int, initialState: Int) {

@@ -55,10 +55,11 @@ public interface SmPLTypes {
   IElementType POSITION_METADECL = new SmPLElementType("POSITION_METADECL");
   IElementType REGEXP_CONSTRAINT = new SmPLElementType("REGEXP_CONSTRAINT");
   IElementType RULENAME = new SmPLElementType("RULENAME");
-  IElementType SCRIPT = new SmPLElementType("SCRIPT");
   IElementType SCRIPT_BODY = new SmPLElementType("SCRIPT_BODY");
   IElementType SCRIPT_CODE = new SmPLElementType("SCRIPT_CODE");
   IElementType SCRIPT_CONSTRAINT = new SmPLElementType("SCRIPT_CONSTRAINT");
+  IElementType SCRIPT_INLINE = new SmPLElementType("SCRIPT_INLINE");
+  IElementType SCRIPT_LANG = new SmPLElementType("SCRIPT_LANG");
   IElementType SCRIPT_METADECL = new SmPLElementType("SCRIPT_METADECL");
   IElementType SCRIPT_METADECL_ASSIGN = new SmPLElementType("SCRIPT_METADECL_ASSIGN");
   IElementType SCRIPT_METADECL_ASSIGN_RULE = new SmPLElementType("SCRIPT_METADECL_ASSIGN_RULE");
@@ -129,7 +130,6 @@ public interface SmPLTypes {
   IElementType INITIALIZE = new SmPLTokenType("initialize");
   IElementType INITIALIZER = new SmPLTokenType("initializer");
   IElementType INITIALIZER_LIST = new SmPLTokenType("initializer list");
-  IElementType INTEGER = new SmPLTokenType("INTEGER");
   IElementType ITERATOR = new SmPLTokenType("iterator");
   IElementType ITERATOR_NAME = new SmPLTokenType("iterator name");
   IElementType LBRACE = new SmPLTokenType("{");
@@ -316,9 +316,6 @@ public interface SmPLTypes {
       else if (type == RULENAME) {
         return new SmPLRulenameImpl(node);
       }
-      else if (type == SCRIPT) {
-        return new SmPLScriptImpl(node);
-      }
       else if (type == SCRIPT_BODY) {
         return new SmPLScriptBodyImpl(node);
       }
@@ -327,6 +324,12 @@ public interface SmPLTypes {
       }
       else if (type == SCRIPT_CONSTRAINT) {
         return new SmPLScriptConstraintImpl(node);
+      }
+      else if (type == SCRIPT_INLINE) {
+        return new SmPLScriptInlineImpl(node);
+      }
+      else if (type == SCRIPT_LANG) {
+        return new SmPLScriptLangImpl(node);
       }
       else if (type == SCRIPT_METADECL) {
         return new SmPLScriptMetadeclImpl(node);

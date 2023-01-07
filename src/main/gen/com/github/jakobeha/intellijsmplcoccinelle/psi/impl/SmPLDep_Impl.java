@@ -46,6 +46,12 @@ public class SmPLDep_Impl extends SmPLCompositeElementImpl implements SmPLDep_ {
 
   @Override
   @Nullable
+  public PsiElement getFileIn() {
+    return findChildByType(FILE_IN);
+  }
+
+  @Override
+  @Nullable
   public PsiElement getNever() {
     return findChildByType(NEVER);
   }

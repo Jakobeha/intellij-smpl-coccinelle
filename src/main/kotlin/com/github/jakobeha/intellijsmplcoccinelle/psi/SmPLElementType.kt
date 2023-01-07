@@ -4,6 +4,6 @@ import com.github.jakobeha.intellijsmplcoccinelle.SmPL
 import com.intellij.psi.tree.IElementType
 
 
-class SmPLTokenType(debugName: String): IElementType(debugName, SmPL) {
-    override fun toString(): String = "SmPLTokenType.${super.toString()}"
+class SmPLElementType(debugName: String): IElementType(debugName, SmPL) {
+    override fun toString(): String = "SmPLElementType.${super.toString()}"
 }

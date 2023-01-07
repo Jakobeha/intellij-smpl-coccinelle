@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLTypes.*;
 import com.github.jakobeha.intellijsmplcoccinelle.psi.*;
 
-public class SmPLScriptImpl extends SmPLCompositeElementImpl implements SmPLScript {
+public class SmPLScriptInlineImpl extends SmPLCompositeElementImpl implements SmPLScriptInline {
 
-  public SmPLScriptImpl(@NotNull ASTNode node) {
+  public SmPLScriptInlineImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmPLVisitor visitor) {
-    visitor.visitScript(this);
+    visitor.visitScriptInline(this);
   }
 
   @Override
@@ -30,6 +30,12 @@ public class SmPLScriptImpl extends SmPLCompositeElementImpl implements SmPLScri
   @NotNull
   public List<SmPLId> getIdList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SmPLId.class);
+  }
+
+  @Override
+  @Nullable
+  public SmPLScriptLang getScriptLang() {
+    return findChildByClass(SmPLScriptLang.class);
   }
 
   @Override

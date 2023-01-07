@@ -177,10 +177,10 @@ dep ::=
 dep_ ::=
     id |
     '!' id |
-    '!(' dep ')' |
+    '!' '(' dep ')' |
     'ever' id |
     'never' id |
-    'file' 'in' string |
+    'file in' string |
     '(' dep ')'
     {pin(".*")=1}
 private exists ::=
@@ -275,20 +275,20 @@ constraint ::=
 id_compare_constraint ::=
     ('=' | '!=') (pmid | '{' <<commaSeparate pmid>> '}')
 int_compare_constraint  ::=
-    ('=' | '!=') (INTEGER | '{' <<commaSeparate INTEGER>> '}')
+    ('=' | '!=') (integer | '{' <<commaSeparate integer>> '}')
 regexp_constraint ::= ('=~' | '!~') string {pin=1}
-script_constraint ::= ':' script {pin=1}
+script_constraint ::= ':' script_inline {pin=1}
 seed ::=
     '=' string_seed |
-    '=' script
+    '=' script_inline
 string_seed ::= (string | pmid) ('##' (string | pmid))*
-script ::= 'script' ':' language '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}' {pin=2}
+script_inline ::= 'script' ':' script_lang '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}' {pin=2}
 
 script_metavariables ::=
-    '@' ('script' | 'initialize' | 'finalize') ':' language [rulename] ['depends' 'on' dep] '@' script_metadecl* '@@'
-    {pin=2;recoverWhile=script_metavariables_recover}
+    '@' ('script' | 'initialize' | 'finalize') ':' script_lang [rulename] ['depends' 'on' dep] '@' script_metadecl* '@@'
+    {pin=2 recoverWhile=script_metavariables_recover}
 private script_metavariables_recover ::= !(SCRIPT_LINE | TRANSFORMATION_LINE)
-private language ::= 'python' | 'ocaml'
+script_lang ::= 'python' | 'ocaml'
 script_metadecl ::= script_metadecl_ ';'
 private script_metadecl_ ::=
     script_metadecl_assign [script_metadecl_assign_rule]

@@ -39,15 +39,34 @@ class SmPLColorSettingsPage : ColorSettingsPage {
 
     companion object {
         private val DESCRIPTORS = arrayOf(
-            AttributesDescriptor("Keywords", SmPLSyntaxHighlighter.SMPL_KEYWORD),
-            AttributesDescriptor("String", SmPLSyntaxHighlighter.SMPL_STRING),
-            AttributesDescriptor("Match kind", SmPLSyntaxHighlighter.SMPL_MATCH_KIND),
-            AttributesDescriptor("Value", SmPLSyntaxHighlighter.SMPL_INTEGER),
-            AttributesDescriptor("Type", SmPLSyntaxHighlighter.SMPL_TYPE),
-            AttributesDescriptor("Annotation", SmPLSyntaxHighlighter.SMPL_ANNOTATION),
-            AttributesDescriptor("Preprocessor", SmPLSyntaxHighlighter.SMPL_PRE_PROCESS),
-            AttributesDescriptor("Comment", SmPLSyntaxHighlighter.SMPL_COMMENT),
-            AttributesDescriptor("Unknown token", SmPLSyntaxHighlighter.SMPL_UNKNOWN_TOKEN)
+            AttributesDescriptor("'#include'", SmPLSyntaxHighlighter.INCLUDE_HEADER),
+            AttributesDescriptor("'virtual'", SmPLSyntaxHighlighter.VIRTUAL_HEADER),
+            AttributesDescriptor("Metavariables Block Fence (@ and @@)", SmPLSyntaxHighlighter.METAVARS_AT),
+            @Suppress("DialogTitleCapitalization")
+            // AttributesDescriptor("Metavariables Block Head Keyword (script, initialize, finalize)", SmPLSyntaxHighlighter.METAVARS_HEAD_KEYWORD),
+            AttributesDescriptor("Metadeclaration Head Keyword (fresh identifier, ...)", SmPLSyntaxHighlighter.METADECL_HEAD_KEYWORD),
+            AttributesDescriptor("Metavariables Keyword (depends on, ...)", SmPLSyntaxHighlighter.METADECL_BODY_KEYWORD),
+            @Suppress("DialogTitleCapitalization")
+            // AttributesDescriptor("'disable' Special Identifier", SmPLSyntaxHighlighter.DISABLE_SPECIAL_IDENT),
+            AttributesDescriptor("Script language (python, ocaml)", SmPLSyntaxHighlighter.SCRIPT_LANG),
+            AttributesDescriptor("Operator (=, :)", SmPLSyntaxHighlighter.RESERVED_OP),
+            AttributesDescriptor("Dot (.)", SmPLSyntaxHighlighter.DOT),
+            AttributesDescriptor("Comma (,)", SmPLSyntaxHighlighter.COMMA),
+            AttributesDescriptor("Semicolon (;)", SmPLSyntaxHighlighter.SEMICOLON),
+            AttributesDescriptor("Brackets ('[' and ']')", SmPLSyntaxHighlighter.BRACKETS),
+            AttributesDescriptor("Parenthesis ('(' and ')')", SmPLSyntaxHighlighter.PARENTHESES),
+            AttributesDescriptor("Braces ('{' and '}')", SmPLSyntaxHighlighter.BRACES),
+            AttributesDescriptor("Line comment (//...)", SmPLSyntaxHighlighter.LINE_COMMENT),
+            AttributesDescriptor("Block comment (/* ... */)", SmPLSyntaxHighlighter.BLOCK_COMMENT),
+            AttributesDescriptor("Doc comment (///..., /** ... */)", SmPLSyntaxHighlighter.DOC_COMMENT),
+            AttributesDescriptor("Integer", SmPLSyntaxHighlighter.INTEGER),
+            AttributesDescriptor("String", SmPLSyntaxHighlighter.STRING),
+            AttributesDescriptor("Syspath (<...> in #include <...>)", SmPLSyntaxHighlighter.SYSPATH),
+            // AttributesDescriptor("Escape or Splice Token", SmPLSyntaxHighlighter.ESCAPE)
         )
+
+        init {
+            assert(DESCRIPTORS.size == SmPLSyntaxHighlighter.ATTRIBUTE_KEYS.size)
+        }
     }
 }

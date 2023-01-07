@@ -13,6 +13,9 @@ public interface SmPLScriptMetavariables extends SmPLCompositeElement {
   @Nullable
   SmPLRulename getRulename();
 
+  @Nullable
+  SmPLScriptLang getScriptLang();
+
   @NotNull
   List<SmPLScriptMetadecl> getScriptMetadeclList();
 

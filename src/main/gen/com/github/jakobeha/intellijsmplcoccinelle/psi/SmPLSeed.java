@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface SmPLSeed extends SmPLCompositeElement {
 
   @Nullable
-  SmPLScript getScript();
+  SmPLScriptInline getScriptInline();
 
   @Nullable
   SmPLStringSeed getStringSeed();

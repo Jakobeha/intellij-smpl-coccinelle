@@ -7,6 +7,9 @@ import com.intellij.psi.PsiElement;
 
 public interface SmPLIntCompareConstraint extends SmPLCompositeElement {
 
+  @NotNull
+  List<SmPLInteger> getIntegerList();
+
   @Nullable
   PsiElement getEquals();
 

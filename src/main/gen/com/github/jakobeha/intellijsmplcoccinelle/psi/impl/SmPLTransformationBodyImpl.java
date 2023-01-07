@@ -12,7 +12,7 @@ import com.github.jakobeha.intellijsmplcoccinelle.psi.*;
 
 public class SmPLTransformationBodyImpl extends SmPLCodeBodyBase implements SmPLTransformationBody {
 
-  public SmPLTransformationBodyImpl(ASTNode node) {
+  public SmPLTransformationBodyImpl(@NotNull ASTNode node) {
     super(node);
   }
 

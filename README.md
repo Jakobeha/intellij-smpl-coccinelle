@@ -37,7 +37,7 @@ Language support for [SmPL](https://coccinelle.gitlabpages.inria.fr/website), th
 ---
 Plugin based on the [IntelliJ Platform Plugin Template][template].
 
-Also code used from [IntelliJ P4 Plugin](https://github.com/Yi-Tseng/IntelliJ-P4-Plugin)
+Also code used from [IntelliJ P4 Plugin](https://github.com/Yi-Tseng/IntelliJ-P4-Plugin), [Intellij-HaskForce](https://github.com/carymrobbins/intellij-haskforce), and [IntelliJ Dart](https://github.com/JetBrains/intellij-plugins/tree/0f07ca63355d5530b441ca566c98f17c560e77f8/Dart)
 
 Icon: [Tux Paint, GPL <http://www.gnu.org/licenses/gpl.html>, via Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Tux_Paint_ladybug.svg)
 

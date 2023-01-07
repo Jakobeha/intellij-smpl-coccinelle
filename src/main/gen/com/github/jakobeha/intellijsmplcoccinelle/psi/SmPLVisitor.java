@@ -290,6 +290,10 @@ public class SmPLVisitor extends PsiElementVisitor {
     visitCompositeElement(o);
   }
 
+  public void visitVid(@NotNull SmPLVid o) {
+    visitCompositeElement(o);
+  }
+
   public void visitVirtualCocci(@NotNull SmPLVirtualCocci o) {
     visitCompositeElement(o);
   }

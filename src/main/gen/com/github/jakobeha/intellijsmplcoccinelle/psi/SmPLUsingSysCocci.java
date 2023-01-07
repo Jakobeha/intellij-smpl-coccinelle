@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface SmPLUsingSysCocci extends SmPLCompositeElement {
 
   @NotNull
-  PsiElement getUsing();
+  PsiElement getUsingInclude();
 
   @NotNull
   PsiElement getSyspath();

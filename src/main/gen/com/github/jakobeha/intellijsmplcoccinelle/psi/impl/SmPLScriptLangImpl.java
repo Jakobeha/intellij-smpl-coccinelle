@@ -26,4 +26,16 @@ public class SmPLScriptLangImpl extends SmPLCompositeElementImpl implements SmPL
     else super.accept(visitor);
   }
 
+  @Override
+  @Nullable
+  public PsiElement getOcaml() {
+    return findChildByType(OCAML);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getPython() {
+    return findChildByType(PYTHON);
+  }
+
 }

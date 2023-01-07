@@ -79,6 +79,7 @@ public interface SmPLTypes {
   IElementType USING_COCCI = new SmPLElementType("USING_COCCI");
   IElementType USING_RULEATTR = new SmPLElementType("USING_RULEATTR");
   IElementType USING_SYS_COCCI = new SmPLElementType("USING_SYS_COCCI");
+  IElementType VID = new SmPLElementType("VID");
   IElementType VIRTUAL_COCCI = new SmPLElementType("VIRTUAL_COCCI");
 
   IElementType AND = new SmPLTokenType("&");
@@ -86,6 +87,9 @@ public interface SmPLTypes {
   IElementType AT = new SmPLTokenType("@");
   IElementType ATTRIBUTE = new SmPLTokenType("attribute");
   IElementType ATTRIBUTE_NAME = new SmPLTokenType("attribute name");
+  IElementType AT_FINALIZE_COLON = new SmPLTokenType("@finalize:");
+  IElementType AT_INITIALIZE_COLON = new SmPLTokenType("@initialize:");
+  IElementType AT_SCRIPT_COLON = new SmPLTokenType("@script:");
   IElementType BINARY_OPERATOR = new SmPLTokenType("binary operator");
   IElementType BLOCK_COMMENT = new SmPLTokenType("block_comment");
   IElementType COLON = new SmPLTokenType(":");
@@ -117,7 +121,6 @@ public interface SmPLTypes {
   IElementType FIELD = new SmPLTokenType("field");
   IElementType FIELD_LIST = new SmPLTokenType("field list");
   IElementType FILE_IN = new SmPLTokenType("file in");
-  IElementType FINALIZE = new SmPLTokenType("finalize");
   IElementType FORALL = new SmPLTokenType("forall");
   IElementType FORMAT = new SmPLTokenType("format");
   IElementType FORMAT_LIST = new SmPLTokenType("format list");
@@ -127,7 +130,6 @@ public interface SmPLTypes {
   IElementType IDENTIFIER = new SmPLTokenType("identifier");
   IElementType IDENTIFIER_LIST = new SmPLTokenType("identifier list");
   IElementType IDEXPRESSION = new SmPLTokenType("idexpression");
-  IElementType INITIALIZE = new SmPLTokenType("initialize");
   IElementType INITIALIZER = new SmPLTokenType("initializer");
   IElementType INITIALIZER_LIST = new SmPLTokenType("initializer list");
   IElementType ITERATOR = new SmPLTokenType("iterator");
@@ -142,20 +144,21 @@ public interface SmPLTypes {
   IElementType NEVER = new SmPLTokenType("never");
   IElementType NOT = new SmPLTokenType("!");
   IElementType NOT_EQUALS = new SmPLTokenType("!=");
+  IElementType OCAML = new SmPLTokenType("ocaml");
   IElementType OCAML_BLOCK = new SmPLTokenType("OCAML_BLOCK");
   IElementType OR = new SmPLTokenType("|");
   IElementType PARAMETER = new SmPLTokenType("parameter");
   IElementType PARAMETER_LIST = new SmPLTokenType("parameter list");
   IElementType POSITION = new SmPLTokenType("position");
   IElementType POSITION_ANY = new SmPLTokenType("position any");
+  IElementType PYTHON = new SmPLTokenType("python");
   IElementType PYTHON_BLOCK = new SmPLTokenType("PYTHON_BLOCK");
   IElementType RBRACE = new SmPLTokenType("}");
   IElementType RBRACK = new SmPLTokenType("]");
   IElementType REGEXP_MATCHES = new SmPLTokenType("=~");
   IElementType REGEXP_NOT_MATCHES = new SmPLTokenType("!~");
   IElementType RPAREN = new SmPLTokenType(")");
-  IElementType SCRIPT = new SmPLTokenType("script");
-  IElementType SCRIPT_LINE = new SmPLTokenType("SCRIPT_LINE");
+  IElementType SCRIPT_COLON = new SmPLTokenType("script:");
   IElementType SEMI = new SmPLTokenType(";");
   IElementType STAR = new SmPLTokenType("*");
   IElementType STATEMENT = new SmPLTokenType("statement");
@@ -164,12 +167,13 @@ public interface SmPLTypes {
   IElementType SYMBOL = new SmPLTokenType("symbol");
   IElementType SYSPATH = new SmPLTokenType("syspath");
   IElementType TRANSFORMATION_BLOCK = new SmPLTokenType("TRANSFORMATION_BLOCK");
-  IElementType TRANSFORMATION_LINE = new SmPLTokenType("TRANSFORMATION_LINE");
   IElementType TYPE = new SmPLTokenType("type");
   IElementType TYPEDEF = new SmPLTokenType("typedef");
   IElementType UNARY_OPERATOR = new SmPLTokenType("unary operator");
-  IElementType USING = new SmPLTokenType("using");
-  IElementType VIRTUAL = new SmPLTokenType("virtual");
+  IElementType USING = new SmPLTokenType("USING");
+  IElementType USING_INCLUDE = new SmPLTokenType("using");
+  IElementType VIRTUAL = new SmPLTokenType("VIRTUAL");
+  IElementType VIRTUAL_INCLUDE = new SmPLTokenType("virtual");
   IElementType WORD = new SmPLTokenType("word");
 
   class Factory {
@@ -387,6 +391,9 @@ public interface SmPLTypes {
       }
       else if (type == USING_SYS_COCCI) {
         return new SmPLUsingSysCocciImpl(node);
+      }
+      else if (type == VID) {
+        return new SmPLVidImpl(node);
       }
       else if (type == VIRTUAL_COCCI) {
         return new SmPLVirtualCocciImpl(node);

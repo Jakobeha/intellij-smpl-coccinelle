@@ -10,7 +10,7 @@ public interface SmPLMetadecl extends SmPLCompositeElement {
   @NotNull
   SmPLMetadecl getMetadecl();
 
-  @NotNull
+  @Nullable
   PsiElement getSemi();
 
 }

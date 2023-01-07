@@ -28,12 +28,6 @@ public class SmPLScriptMetavariablesImpl extends SmPLCompositeElementImpl implem
 
   @Override
   @Nullable
-  public SmPLDep getDep() {
-    return findChildByClass(SmPLDep.class);
-  }
-
-  @Override
-  @Nullable
   public SmPLRulename getRulename() {
     return findChildByClass(SmPLRulename.class);
   }
@@ -52,26 +46,26 @@ public class SmPLScriptMetavariablesImpl extends SmPLCompositeElementImpl implem
 
   @Override
   @Nullable
-  public PsiElement getFinalize() {
-    return findChildByType(FINALIZE);
+  public PsiElement getAtFinalizeColon() {
+    return findChildByType(AT_FINALIZE_COLON);
   }
 
   @Override
   @Nullable
-  public PsiElement getInitialize() {
-    return findChildByType(INITIALIZE);
+  public PsiElement getAtInitializeColon() {
+    return findChildByType(AT_INITIALIZE_COLON);
   }
 
   @Override
   @Nullable
-  public PsiElement getScript() {
-    return findChildByType(SCRIPT);
+  public PsiElement getAtScriptColon() {
+    return findChildByType(AT_SCRIPT_COLON);
   }
 
   @Override
   @Nullable
-  public PsiElement getColon() {
-    return findChildByType(COLON);
+  public PsiElement getAt() {
+    return findChildByType(AT);
   }
 
   @Override

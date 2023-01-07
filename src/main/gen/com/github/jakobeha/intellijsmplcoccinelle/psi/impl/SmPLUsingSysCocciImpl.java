@@ -28,8 +28,8 @@ public class SmPLUsingSysCocciImpl extends SmPLCompositeElementImpl implements S
 
   @Override
   @NotNull
-  public PsiElement getUsing() {
-    return findNotNullChildByType(USING);
+  public PsiElement getUsingInclude() {
+    return findNotNullChildByType(USING_INCLUDE);
   }
 
   @Override

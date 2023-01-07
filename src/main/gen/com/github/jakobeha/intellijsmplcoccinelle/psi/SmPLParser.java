@@ -109,7 +109,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // pmid ['=' assignop_constraint]
   public static boolean assignopdecl(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignopdecl")) return false;
-    if (!nextTokenIs(b, "<assignopdecl>", LPAREN, WORD)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, ASSIGNOPDECL, "<assignopdecl>");
     r = pmid(b, l + 1);
@@ -235,7 +234,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // pmid  ['=' binop_constraint]
   public static boolean binopdecl(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "binopdecl")) return false;
-    if (!nextTokenIs(b, "<binopdecl>", LPAREN, WORD)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, BINOPDECL, "<binopdecl>");
     r = pmid(b, l + 1);
@@ -289,7 +287,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !('@' | '@@')
+  // !('@' | '@@' | '@initialize:' | '@script:' | '@finalize:')
   static boolean changeset_recover(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "changeset_recover")) return false;
     boolean r;
@@ -299,12 +297,15 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '@' | '@@'
+  // '@' | '@@' | '@initialize:' | '@script:' | '@finalize:'
   private static boolean changeset_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "changeset_recover_0")) return false;
     boolean r;
     r = consumeToken(b, AT);
     if (!r) r = consumeToken(b, DOUBLE_AT);
+    if (!r) r = consumeToken(b, AT_INITIALIZE_COLON);
+    if (!r) r = consumeToken(b, AT_SCRIPT_COLON);
+    if (!r) r = consumeToken(b, AT_FINALIZE_COLON);
     return r;
   }
 
@@ -321,7 +322,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !('@' | '@@' | '#include' | 'using' | 'virtual')
+  // !('@' | '@@' | '@initialize:' | '@script:' | '@finalize:' | '#include' | USING_INCLUDE | VIRTUAL_INCLUDE)
   static boolean cocci_header_recover(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "cocci_header_recover")) return false;
     boolean r;
@@ -331,15 +332,18 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // '@' | '@@' | '#include' | 'using' | 'virtual'
+  // '@' | '@@' | '@initialize:' | '@script:' | '@finalize:' | '#include' | USING_INCLUDE | VIRTUAL_INCLUDE
   private static boolean cocci_header_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "cocci_header_recover_0")) return false;
     boolean r;
     r = consumeToken(b, AT);
     if (!r) r = consumeToken(b, DOUBLE_AT);
+    if (!r) r = consumeToken(b, AT_INITIALIZE_COLON);
+    if (!r) r = consumeToken(b, AT_SCRIPT_COLON);
+    if (!r) r = consumeToken(b, AT_FINALIZE_COLON);
     if (!r) r = consumeToken(b, HASH_INCLUDE);
-    if (!r) r = consumeToken(b, USING);
-    if (!r) r = consumeToken(b, VIRTUAL);
+    if (!r) r = consumeToken(b, USING_INCLUDE);
+    if (!r) r = consumeToken(b, VIRTUAL_INCLUDE);
     return r;
   }
 
@@ -422,12 +426,13 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // constraint ('&&' constraint)*
   public static boolean constraints(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "constraints")) return false;
-    boolean r;
+    boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, CONSTRAINTS, "<constraints>");
     r = constraint(b, l + 1);
+    p = r; // pin = 1
     r = r && constraints_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   // ('&&' constraint)*
@@ -1154,7 +1159,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   //     using_sys_cocci
   static boolean include_cocci(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "include_cocci")) return false;
-    if (!nextTokenIs(b, "", HASH_INCLUDE, USING)) return false;
+    if (!nextTokenIs(b, "", HASH_INCLUDE, USING_INCLUDE)) return false;
     boolean r;
     r = c_include_cocci(b, l + 1);
     if (!r) r = using_cocci(b, l + 1);
@@ -1329,12 +1334,13 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // metadecl_ ';'
   public static boolean metadecl(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "metadecl")) return false;
-    boolean r;
+    boolean r, p;
     Marker m = enter_section_(b, l, _COLLAPSE_, METADECL, "<metadecl>");
     r = metadecl_(b, l + 1);
+    p = r; // pin = 1
     r = r && consumeToken(b, SEMI);
-    exit_section_(b, l, m, r, false, null);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -1476,9 +1482,9 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_);
     r = consumeToken(b, AT);
     r = r && rulename(b, l + 1);
-    r = r && consumeToken(b, AT);
-    p = r; // pin = 3
-    r = r && report_error_(b, metavariables_1_3(b, l + 1));
+    p = r; // pin = 2
+    r = r && report_error_(b, consumeToken(b, AT));
+    r = p && report_error_(b, metavariables_1_3(b, l + 1)) && r;
     r = p && consumeToken(b, DOUBLE_AT) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
@@ -1496,7 +1502,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // !(SCRIPT_LINE | TRANSFORMATION_LINE)
+  // !(OCAML_BLOCK | PYTHON_BLOCK | TRANSFORMATION_BLOCK)
   static boolean metavariables_recover(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "metavariables_recover")) return false;
     boolean r;
@@ -1506,12 +1512,13 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // SCRIPT_LINE | TRANSFORMATION_LINE
+  // OCAML_BLOCK | PYTHON_BLOCK | TRANSFORMATION_BLOCK
   private static boolean metavariables_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "metavariables_recover_0")) return false;
     boolean r;
-    r = consumeToken(b, SCRIPT_LINE);
-    if (!r) r = consumeToken(b, TRANSFORMATION_LINE);
+    r = consumeToken(b, OCAML_BLOCK);
+    if (!r) r = consumeToken(b, PYTHON_BLOCK);
+    if (!r) r = consumeToken(b, TRANSFORMATION_BLOCK);
     return r;
   }
 
@@ -1559,16 +1566,16 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // id ['.' id]
+  // vid ['.' id]
   public static boolean pmid(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pmid")) return false;
-    if (!nextTokenIs(b, "<pmid>", LPAREN, WORD)) return false;
-    boolean r;
+    boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, PMID, "<pmid>");
-    r = id(b, l + 1);
+    r = vid(b, l + 1);
+    p = r; // pin = 1
     r = r && pmid_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   // ['.' id]
@@ -1593,7 +1600,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // <<commaSeparate pmid>>
   public static boolean pmids(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pmids")) return false;
-    if (!nextTokenIs(b, "<pmids>", LPAREN, WORD)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PMIDS, "<pmids>");
     r = commaSeparate(b, l + 1, SmPLParser::pmid);
@@ -1605,7 +1611,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // <<commaSeparate (pmid [constraints])>>
   public static boolean pmids_with_constraints(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pmids_with_constraints")) return false;
-    if (!nextTokenIs(b, "<pmids with constraints>", LPAREN, WORD)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PMIDS_WITH_CONSTRAINTS, "<pmids with constraints>");
     r = commaSeparate(b, l + 1, SmPLParser::pmids_with_constraints_0_0);
@@ -1635,7 +1640,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // <<commaSeparate (pmid [seed])>>
   public static boolean pmids_with_seed(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "pmids_with_seed")) return false;
-    if (!nextTokenIs(b, "<pmids with seed>", LPAREN, WORD)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, PMIDS_WITH_SEED, "<pmids with seed>");
     r = commaSeparate(b, l + 1, SmPLParser::pmids_with_seed_0_0);
@@ -1841,13 +1845,13 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // script_metavariables script_body
   public static boolean script_code(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_code")) return false;
-    if (!nextTokenIs(b, AT)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    boolean r, p;
+    Marker m = enter_section_(b, l, _NONE_, SCRIPT_CODE, "<script code>");
     r = script_metavariables(b, l + 1);
+    p = r; // pin = 1
     r = r && script_body(b, l + 1);
-    exit_section_(b, m, SCRIPT_CODE, r);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -1865,25 +1869,25 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'script' ':' script_lang '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}'
+  // 'script:' script_lang '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}'
   public static boolean script_inline(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_inline")) return false;
-    if (!nextTokenIs(b, SCRIPT)) return false;
+    if (!nextTokenIs(b, SCRIPT_COLON)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, SCRIPT_INLINE, null);
-    r = consumeTokens(b, 2, SCRIPT, COLON);
-    p = r; // pin = 2
+    r = consumeToken(b, SCRIPT_COLON);
+    p = r; // pin = 1
     r = r && report_error_(b, script_lang(b, l + 1));
     r = p && report_error_(b, consumeToken(b, LPAREN)) && r;
-    r = p && report_error_(b, commaSeparate(b, l + 1, SmPLParser::script_inline_4_0)) && r;
+    r = p && report_error_(b, commaSeparate(b, l + 1, SmPLParser::script_inline_3_0)) && r;
     r = p && report_error_(b, consumeTokens(b, -1, RPAREN, LBRACE, EXPR, RBRACE)) && r;
     exit_section_(b, l, m, r, p, null);
     return r || p;
   }
 
   // id '.' id
-  private static boolean script_inline_4_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "script_inline_4_0")) return false;
+  private static boolean script_inline_3_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "script_inline_3_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = id(b, l + 1);
@@ -1897,10 +1901,11 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // 'python' | 'ocaml'
   public static boolean script_lang(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_lang")) return false;
+    if (!nextTokenIs(b, "<script lang>", OCAML, PYTHON)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SCRIPT_LANG, "<script lang>");
-    r = consumeToken(b, "python");
-    if (!r) r = consumeToken(b, "ocaml");
+    r = consumeToken(b, PYTHON);
+    if (!r) r = consumeToken(b, OCAML);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -1910,12 +1915,13 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   public static boolean script_metadecl(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_metadecl")) return false;
     if (!nextTokenIs(b, "<metadecl>", LPAREN, WORD)) return false;
-    boolean r;
+    boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, SCRIPT_METADECL, "<metadecl>");
     r = script_metadecl_(b, l + 1);
+    p = r; // pin = 1
     r = r && consumeToken(b, SEMI);
-    exit_section_(b, l, m, r, false, null);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -1966,7 +1972,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '<<' id '.' id [script_metadecl_assign_value]
+  // '<<' vid '.' id [script_metadecl_assign_value]
   public static boolean script_metadecl_assign_rule(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_metadecl_assign_rule")) return false;
     if (!nextTokenIs(b, LEFT_LEFT)) return false;
@@ -1974,7 +1980,7 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, SCRIPT_METADECL_ASSIGN_RULE, null);
     r = consumeToken(b, LEFT_LEFT);
     p = r; // pin = 1
-    r = r && report_error_(b, id(b, l + 1));
+    r = r && report_error_(b, vid(b, l + 1));
     r = p && report_error_(b, consumeToken(b, DOT)) && r;
     r = p && report_error_(b, id(b, l + 1)) && r;
     r = p && script_metadecl_assign_rule_4(b, l + 1) && r;
@@ -2035,74 +2041,52 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // '@' ('script' | 'initialize' | 'finalize') ':' script_lang [rulename] ['depends' 'on' dep] '@' script_metadecl* '@@'
+  // ('@script:' | '@initialize:' | '@finalize:') script_lang [rulename] '@' script_metadecl* '@@'
   public static boolean script_metavariables(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_metavariables")) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, SCRIPT_METAVARIABLES, "<script metavariables>");
-    r = consumeToken(b, AT);
-    r = r && script_metavariables_1(b, l + 1);
-    p = r; // pin = 2
-    r = r && report_error_(b, consumeToken(b, COLON));
-    r = p && report_error_(b, script_lang(b, l + 1)) && r;
-    r = p && report_error_(b, script_metavariables_4(b, l + 1)) && r;
-    r = p && report_error_(b, script_metavariables_5(b, l + 1)) && r;
+    r = script_metavariables_0(b, l + 1);
+    p = r; // pin = 1
+    r = r && report_error_(b, script_lang(b, l + 1));
+    r = p && report_error_(b, script_metavariables_2(b, l + 1)) && r;
     r = p && report_error_(b, consumeToken(b, AT)) && r;
-    r = p && report_error_(b, script_metavariables_7(b, l + 1)) && r;
+    r = p && report_error_(b, script_metavariables_4(b, l + 1)) && r;
     r = p && consumeToken(b, DOUBLE_AT) && r;
     exit_section_(b, l, m, r, p, SmPLParser::script_metavariables_recover);
     return r || p;
   }
 
-  // 'script' | 'initialize' | 'finalize'
-  private static boolean script_metavariables_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "script_metavariables_1")) return false;
+  // '@script:' | '@initialize:' | '@finalize:'
+  private static boolean script_metavariables_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "script_metavariables_0")) return false;
     boolean r;
-    r = consumeToken(b, SCRIPT);
-    if (!r) r = consumeToken(b, INITIALIZE);
-    if (!r) r = consumeToken(b, FINALIZE);
+    r = consumeToken(b, AT_SCRIPT_COLON);
+    if (!r) r = consumeToken(b, AT_INITIALIZE_COLON);
+    if (!r) r = consumeToken(b, AT_FINALIZE_COLON);
     return r;
   }
 
   // [rulename]
-  private static boolean script_metavariables_4(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "script_metavariables_4")) return false;
+  private static boolean script_metavariables_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "script_metavariables_2")) return false;
     rulename(b, l + 1);
     return true;
   }
 
-  // ['depends' 'on' dep]
-  private static boolean script_metavariables_5(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "script_metavariables_5")) return false;
-    script_metavariables_5_0(b, l + 1);
-    return true;
-  }
-
-  // 'depends' 'on' dep
-  private static boolean script_metavariables_5_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "script_metavariables_5_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, "depends");
-    r = r && consumeToken(b, "on");
-    r = r && dep(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
   // script_metadecl*
-  private static boolean script_metavariables_7(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "script_metavariables_7")) return false;
+  private static boolean script_metavariables_4(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "script_metavariables_4")) return false;
     while (true) {
       int c = current_position_(b);
       if (!script_metadecl(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "script_metavariables_7", c)) break;
+      if (!empty_element_parsed_guard_(b, "script_metavariables_4", c)) break;
     }
     return true;
   }
 
   /* ********************************************************** */
-  // !(SCRIPT_LINE | TRANSFORMATION_LINE)
+  // !(OCAML_BLOCK | PYTHON_BLOCK | TRANSFORMATION_BLOCK)
   static boolean script_metavariables_recover(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_metavariables_recover")) return false;
     boolean r;
@@ -2112,12 +2096,13 @@ public class SmPLParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // SCRIPT_LINE | TRANSFORMATION_LINE
+  // OCAML_BLOCK | PYTHON_BLOCK | TRANSFORMATION_BLOCK
   private static boolean script_metavariables_recover_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "script_metavariables_recover_0")) return false;
     boolean r;
-    r = consumeToken(b, SCRIPT_LINE);
-    if (!r) r = consumeToken(b, TRANSFORMATION_LINE);
+    r = consumeToken(b, OCAML_BLOCK);
+    if (!r) r = consumeToken(b, PYTHON_BLOCK);
+    if (!r) r = consumeToken(b, TRANSFORMATION_BLOCK);
     return r;
   }
 
@@ -2251,12 +2236,13 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   public static boolean transformation(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "transformation")) return false;
     if (!nextTokenIs(b, "<transformation>", AT, DOUBLE_AT)) return false;
-    boolean r;
+    boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, TRANSFORMATION, "<transformation>");
     r = metavariables(b, l + 1);
+    p = r; // pin = 1
     r = r && transformation_body(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
+    exit_section_(b, l, m, r, p, null);
+    return r || p;
   }
 
   /* ********************************************************** */
@@ -2360,7 +2346,6 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   // pmid  ['=' unop_constraint]
   public static boolean unopdecl(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "unopdecl")) return false;
-    if (!nextTokenIs(b, "<unopdecl>", LPAREN, WORD)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, UNOPDECL, "<unopdecl>");
     r = pmid(b, l + 1);
@@ -2388,19 +2373,19 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'using' string
+  // USING_INCLUDE string
   public static boolean using_cocci(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "using_cocci")) return false;
-    if (!nextTokenIs(b, USING)) return false;
+    if (!nextTokenIs(b, USING_INCLUDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 2, USING, STRING);
+    r = consumeTokens(b, 2, USING_INCLUDE, STRING);
     exit_section_(b, m, USING_COCCI, r);
     return r;
   }
 
   /* ********************************************************** */
-  // 'using' <<commaSeparate string>>
+  // USING <<commaSeparate string>>
   public static boolean using_ruleattr(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "using_ruleattr")) return false;
     if (!nextTokenIs(b, USING)) return false;
@@ -2414,25 +2399,37 @@ public class SmPLParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // 'using' syspath
+  // USING_INCLUDE syspath
   public static boolean using_sys_cocci(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "using_sys_cocci")) return false;
-    if (!nextTokenIs(b, USING)) return false;
+    if (!nextTokenIs(b, USING_INCLUDE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeTokens(b, 2, USING, SYSPATH);
+    r = consumeTokens(b, 2, USING_INCLUDE, SYSPATH);
     exit_section_(b, m, USING_SYS_COCCI, r);
     return r;
   }
 
   /* ********************************************************** */
-  // 'virtual' <<commaSeparate word>>
+  // VIRTUAL | id
+  public static boolean vid(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "vid")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, VID, "<vid>");
+    r = consumeToken(b, VIRTUAL);
+    if (!r) r = id(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
+  // VIRTUAL_INCLUDE <<commaSeparate word>>
   public static boolean virtual_cocci(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "virtual_cocci")) return false;
-    if (!nextTokenIs(b, VIRTUAL)) return false;
+    if (!nextTokenIs(b, VIRTUAL_INCLUDE)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, VIRTUAL_COCCI, null);
-    r = consumeToken(b, VIRTUAL);
+    r = consumeToken(b, VIRTUAL_INCLUDE);
     p = r; // pin = 1
     r = r && commaSeparate(b, l + 1, WORD_parser_);
     exit_section_(b, l, m, r, p, null);

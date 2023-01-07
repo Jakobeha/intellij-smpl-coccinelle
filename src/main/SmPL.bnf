@@ -24,11 +24,16 @@
         // Punctuation
         at='@'
         double_at='@@'
+        double_and='&&'
+        double_or='||'
+        not_equals='!='
+        regexp_matches='=~'
+        regexp_not_matches='!~'
+        concat='##'
+        left_left='<<'
         not='!'
         and='&'
         or='|'
-        double_and='&&'
-        double_or='||'
         comma=','
         semi=';'
         star='*'
@@ -41,65 +46,65 @@
         rbrace='}'
         dot='.'
         colon=':'
-        not_equals='!='
-        regexp_matches='=~'
-        regexp_not_matches='!~'
-        concat='##'
-        left_left='<<'
         // Reserved IDs. Should be tokens for IntelliJ reasons. Gives us a nicer
         // PSI tree as side effect.
+        DEPENDS_ON="depends on"
+        FRESH_IDENTIFIER="fresh identifier"
+        IDENTIFIER_LIST="identifier list"
+        FILE_IN="file in"
+        FIELD_LIST="field list"
+        PARAMETER_LIST="parameter list"
+        STATEMENT_LIST="statement list"
+        INITIALIZER_LIST="initializer list"
+        LOCAL_IDEXPRESSION="local idexpression"
+        GLOBAL_IDEXPRESSION="global idexpression"
+        EXPRESSION_LIST="expression list"
+        EXPRESSION_ENUM="expression enum"
+        EXPRESSION_STRUCT="expression struct"
+        EXPRESSION_UNION="expression union"
+        FORMAT_LIST="format list"
+        ASSIGNMENT_OPERATOR="assignment operator"
+        BINARY_OPERATOR="binary operator"
+        UNARY_OPERATOR="unary operator"
+        POSITION_ANY="position any"
+        ATTRIBUTE_NAME="attribute name"
+        DECLARER_NAME="declarer name"
+        ITERATOR_NAME="iterator name"
         HASH_INCLUDE="#include"
         VIRTUAL="virtual"
+        VIRTUAL_INCLUDE="virtual"
         EXTENDS="extends"
-        DEPENDS_ON="depends on"
         EVER="ever"
         NEVER="never"
-        FILE_IN="file in"
         USING="using"
+        USING_INCLUDE="using"
         DISABLE="disable"
         EXISTS="exists"
         FORALL="forall"
         EXPRESSION="expression"
         IDENTIFIER="identifier"
         TYPE="type"
-        FRESH_IDENTIFIER="fresh identifier"
-        IDENTIFIER_LIST="identifier list"
         METAVARIABLE="metavariable"
         FIELD="field"
-        FIELD_LIST="field list"
         PARAMETER="parameter"
-        PARAMETER_LIST="parameter list"
         STATEMENT="statement"
-        STATEMENT_LIST="statement list"
         DECLARATION="declaration"
         INITIALIZER="initializer"
-        INITIALIZER_LIST="initializer list"
-        LOCAL_IDEXPRESSION="local idexpression"
-        GLOBAL_IDEXPRESSION="global idexpression"
         IDEXPRESSION="idexpression"
-        EXPRESSION_LIST="expression list"
-        EXPRESSION_ENUM="expression enum"
-        EXPRESSION_STRUCT="expression struct"
-        EXPRESSION_UNION="expression union"
         CONSTANT="constant"
         FORMAT="format"
-        FORMAT_LIST="format list"
-        ASSIGNMENT_OPERATOR="assignment operator"
-        BINARY_OPERATOR="binary operator"
-        UNARY_OPERATOR="unary operator"
         POSITION="position"
-        POSITION_ANY="position any"
         SYMBOL="symbol"
         TYPEDEF="typedef"
-        ATTRIBUTE_NAME="attribute name"
         ATTRIBUTE="attribute"
-        DECLARER_NAME="declarer name"
         DECLARER="declarer"
-        ITERATOR_NAME="iterator name"
         ITERATOR="iterator"
-        SCRIPT="script"
-        INITIALIZE="initialize"
-        FINALIZE="finalize"
+        AT_SCRIPT_COLON="@script:"
+        AT_INITIALIZE_COLON="@initialize:"
+        AT_FINALIZE_COLON="@finalize:"
+        SCRIPT_COLON="script:"
+        PYTHON="python"
+        OCAML="ocaml"
         // Not quite reserved: built-in names for disable-iso
         // OPTIONAL_STORAGE="optional_storage"
         // OPTIONAL_QUALIFIER="optional_qualifier"
@@ -118,11 +123,11 @@
         line_comment = 'regexp://[^\r\n]*'
         block_comment = 'regexp:/\*([^*]|\*[^/])*\*/'
         doc_comment = 'regexp:///[^\r\n]*|/\*\*([^*]|\*[^/])*\*/'
-        // These are actually inferred from lines between the regexps `^@@$` and `^@`
+        // These are actually inferred from lines between the regexps `^@@$` and `^@` (deleted in lexer)
         TRANSFORMATION_BLOCK = 'regexp:[\r\n]:[^\r\n]*([\r\n]:[^\r\n]*)*'
         OCAML_BLOCK = 'regexp:[\r\n],[^\r\n]*([\r\n],[^\r\n]*)*'
         PYTHON_BLOCK = 'regexp:[\r\n];[^\r\n]*(?:[\r\n];[^\r\n]*)*'
-        // Inferred some other way
+        // Inferred some other way (deleted in lexer)
         ctype='CTYPE'
         expr='EXPR'
     ]
@@ -139,26 +144,26 @@ private include_cocci ::=
     using_cocci |
     using_sys_cocci
 c_include_cocci ::= '#include' string {pin=1}
-using_cocci ::= 'using' string {pin=2}
-using_sys_cocci ::= 'using' syspath {pin=2}
-virtual_cocci ::= 'virtual' <<commaSeparate word>> {pin=1}
-private cocci_header_recover ::= !('@' | '@@' | '#include' | 'using' | 'virtual')
+using_cocci ::= USING_INCLUDE string {pin=2}
+using_sys_cocci ::= USING_INCLUDE syspath {pin=2}
+virtual_cocci ::= VIRTUAL_INCLUDE <<commaSeparate word>> {pin=1}
+private cocci_header_recover ::= !('@' | '@@' | '@initialize:' | '@script:' | '@finalize:' | '#include' | USING_INCLUDE | VIRTUAL_INCLUDE)
 
 private changeset ::=
     script_code |
     transformation
     {recoverWhile=changeset_recover}
-transformation ::= metavariables transformation_body
-script_code ::= script_metavariables script_body
+transformation ::= metavariables transformation_body {pin=1}
+script_code ::= script_metavariables script_body {pin=1}
 // '@@' inside metavariables is always consumed by metavariables_recover and script_metavariables_recover,
-// as SCRIPT_LINE | TRANSFORMATION_LINE is always after '@@' in the lexer.
-private changeset_recover ::= !('@' | '@@')
+// as OCAML_BLOCK | PYTHON_BLOCK | TRANSFORMATION_BLOCK is always after '@@' in the lexer.
+private changeset_recover ::= !('@' | '@@' | '@initialize:' | '@script:' | '@finalize:')
 
 metavariables ::=
     '@@' metadecl* '@@' |
     '@' rulename '@' metadecl* '@@'
-    {pin(".*0.*")=1 pin(".*1.*")=3 recoverWhile=metavariables_recover}
-private metavariables_recover ::= !(SCRIPT_LINE | TRANSFORMATION_LINE)
+    {pin(".*0.*")=1 pin(".*1.*")=2 recoverWhile=metavariables_recover}
+private metavariables_recover ::= !(OCAML_BLOCK | PYTHON_BLOCK | TRANSFORMATION_BLOCK)
 rulename ::= [id] ['extends' id] ruleattr*
 private ruleattr ::=
     depends_on_ruleattr |
@@ -167,7 +172,7 @@ private ruleattr ::=
     exists |
     rulekind
 depends_on_ruleattr ::= 'depends on' [exists] dep {pin=1}
-using_ruleattr ::= 'using' <<commaSeparate string>> {pin=1}
+using_ruleattr ::= USING <<commaSeparate string>> {pin=1}
 disable_ruleattr ::= 'disable' <<commaSeparate id>> {pin=1}
 dep ::=
     dep_ '&&' dep |
@@ -191,7 +196,7 @@ private rulekind ::=
     'identifier' |
     'type'
 
-metadecl ::= metadecl_ ';'
+metadecl ::= metadecl_ ';' {pin=1}
 private metadecl_ ::=
     fresh_identifier_metadecl |
     metavariable_metadecl |
@@ -265,8 +270,8 @@ ids ::= <<commaSeparate id>>
 pmids ::= <<commaSeparate pmid>>
 pmids_with_constraints ::= <<commaSeparate (pmid [constraints])>>
 pmids_with_seed ::= <<commaSeparate (pmid [seed])>>
-pmid ::= id ['.' id]
-constraints ::= constraint ('&&' constraint)*
+pmid ::= vid ['.' id] {pin=1}
+constraints ::= constraint ('&&' constraint)* {pin=1}
 constraint ::=
     id_compare_constraint |
     int_compare_constraint |
@@ -282,21 +287,22 @@ seed ::=
     '=' string_seed |
     '=' script_inline
 string_seed ::= (string | pmid) ('##' (string | pmid))*
-script_inline ::= 'script' ':' script_lang '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}' {pin=2}
+script_inline ::= 'script:' script_lang '(' <<commaSeparate (id '.' id)>> ')' '{' expr '}' {pin=1}
 
 script_metavariables ::=
-    '@' ('script' | 'initialize' | 'finalize') ':' script_lang [rulename] ['depends' 'on' dep] '@' script_metadecl* '@@'
-    {pin=2 recoverWhile=script_metavariables_recover}
-private script_metavariables_recover ::= !(SCRIPT_LINE | TRANSFORMATION_LINE)
+    ('@script:' | '@initialize:' | '@finalize:') script_lang [rulename] '@' script_metadecl* '@@'
+    {pin=1 recoverWhile=script_metavariables_recover}
+private script_metavariables_recover ::= !(OCAML_BLOCK | PYTHON_BLOCK | TRANSFORMATION_BLOCK)
 script_lang ::= 'python' | 'ocaml'
-script_metadecl ::= script_metadecl_ ';'
+script_metadecl ::= script_metadecl_ ';' {pin=1}
 private script_metadecl_ ::=
     script_metadecl_assign [script_metadecl_assign_rule]
     {pin=1 recoverWhile=script_metadecl_recover}
 private script_metadecl_recover ::= !(';' | '@@')
 script_metadecl_assign ::= id | '(' id ',' id ')'
-script_metadecl_assign_rule ::= '<<' id '.' id [script_metadecl_assign_value] {pin=1}
+script_metadecl_assign_rule ::= '<<' vid '.' id [script_metadecl_assign_value] {pin=1}
 script_metadecl_assign_value ::= '=' (string | '[' ']') {pin=1}
+vid ::= VIRTUAL | id
 id ::=
     word |
     '(' id ')' |

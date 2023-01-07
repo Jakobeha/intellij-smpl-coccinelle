@@ -7,11 +7,14 @@ import com.intellij.psi.PsiElement;
 
 public interface SmPLScriptMetadeclAssignRule extends SmPLCompositeElement {
 
-  @NotNull
-  List<SmPLId> getIdList();
+  @Nullable
+  SmPLId getId();
 
   @Nullable
   SmPLScriptMetadeclAssignValue getScriptMetadeclAssignValue();
+
+  @Nullable
+  SmPLVid getVid();
 
   @Nullable
   PsiElement getDot();

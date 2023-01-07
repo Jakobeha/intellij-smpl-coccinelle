@@ -27,15 +27,21 @@ public class SmPLScriptMetadeclAssignRuleImpl extends SmPLCompositeElementImpl i
   }
 
   @Override
-  @NotNull
-  public List<SmPLId> getIdList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmPLId.class);
+  @Nullable
+  public SmPLId getId() {
+    return findChildByClass(SmPLId.class);
   }
 
   @Override
   @Nullable
   public SmPLScriptMetadeclAssignValue getScriptMetadeclAssignValue() {
     return findChildByClass(SmPLScriptMetadeclAssignValue.class);
+  }
+
+  @Override
+  @Nullable
+  public SmPLVid getVid() {
+    return findChildByClass(SmPLVid.class);
   }
 
   @Override

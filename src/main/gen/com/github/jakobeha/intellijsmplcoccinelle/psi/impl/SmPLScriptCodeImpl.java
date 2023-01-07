@@ -27,9 +27,9 @@ public class SmPLScriptCodeImpl extends SmPLCompositeElementImpl implements SmPL
   }
 
   @Override
-  @NotNull
+  @Nullable
   public SmPLScriptBody getScriptBody() {
-    return findNotNullChildByClass(SmPLScriptBody.class);
+    return findChildByClass(SmPLScriptBody.class);
   }
 
   @Override

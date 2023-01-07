@@ -20,7 +20,6 @@ class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
         val INCLUDE_HEADER = TextAttributesKey.createTextAttributesKey("SMPL_INCLUDE_HEADER", DefaultLanguageHighlighterColors.METADATA)
         val VIRTUAL_HEADER = TextAttributesKey.createTextAttributesKey("SMPL_VIRTUAL_HEADER", DefaultLanguageHighlighterColors.METADATA)
         val METAVARS_AT = TextAttributesKey.createTextAttributesKey("SMPL_AT", DefaultLanguageHighlighterColors.LABEL)
-        val METAVARS_HEAD_KEYWORD = TextAttributesKey.createTextAttributesKey("SMPL_METAVARS_HEAD_KEYWORD", DefaultLanguageHighlighterColors.LABEL)
         val METADECL_HEAD_KEYWORD = TextAttributesKey.createTextAttributesKey("SMPL_METADECL_HEAD_KEYWORD", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
         val METADECL_BODY_KEYWORD = TextAttributesKey.createTextAttributesKey("SMPL_METADECL_BODY_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
         // val DISABLE_SPECIAL_IDENT = TextAttributesKey.createTextAttributesKey("SMPL_DISABLE_SPECIAL_IDENT", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL)
@@ -55,24 +54,21 @@ class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
             keysPutEach(
                 INCLUDE_HEADER,
                 SmPLTypes.HASH_INCLUDE,
+                SmPLTypes.USING_INCLUDE,
             )
 
             keysPutEach(
                 VIRTUAL_HEADER,
-                SmPLTypes.VIRTUAL
+                SmPLTypes.VIRTUAL_INCLUDE
             )
 
             keysPutEach(
                 METAVARS_AT,
                 SmPLTypes.AT,
-                SmPLTypes.DOUBLE_AT
-            )
-
-            keysPutEach(
-                METAVARS_HEAD_KEYWORD,
-                SmPLTypes.SCRIPT,
-                SmPLTypes.INITIALIZE,
-                SmPLTypes.FINALIZE
+                SmPLTypes.DOUBLE_AT,
+                SmPLTypes.AT_SCRIPT_COLON,
+                SmPLTypes.AT_INITIALIZE_COLON,
+                SmPLTypes.AT_FINALIZE_COLON,
             )
 
             keysPutEach(
@@ -121,15 +117,21 @@ class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
                 METADECL_BODY_KEYWORD,
                 SmPLTypes.DEPENDS_ON,
                 SmPLTypes.USING,
+                SmPLTypes.VIRTUAL,
                 SmPLTypes.DISABLE,
                 SmPLTypes.EVER,
                 SmPLTypes.NEVER,
                 SmPLTypes.FILE_IN,
                 SmPLTypes.EXISTS,
-                SmPLTypes.FORALL
+                SmPLTypes.FORALL,
+                SmPLTypes.SCRIPT_COLON
             )
 
-            keysPutEach(SCRIPT_LANG, SmPLTypes.SCRIPT_LANG)
+            keysPutEach(
+                SCRIPT_LANG,
+                SmPLTypes.OCAML,
+                SmPLTypes.PYTHON,
+            )
 
             keysPutEach(
                 RESERVED_OP,

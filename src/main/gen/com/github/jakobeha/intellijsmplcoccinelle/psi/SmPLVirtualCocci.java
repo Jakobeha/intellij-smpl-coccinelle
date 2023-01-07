@@ -8,6 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface SmPLVirtualCocci extends SmPLCompositeElement {
 
   @NotNull
-  PsiElement getVirtual();
+  PsiElement getVirtualInclude();
 
 }

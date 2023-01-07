@@ -5,12 +5,12 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SmPLScriptLang extends SmPLCompositeElement {
+public interface SmPLVid extends SmPLCompositeElement {
 
   @Nullable
-  PsiElement getOcaml();
+  SmPLId getId();
 
   @Nullable
-  PsiElement getPython();
+  PsiElement getVirtual();
 
 }

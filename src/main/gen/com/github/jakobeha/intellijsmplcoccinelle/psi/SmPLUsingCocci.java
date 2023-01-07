@@ -8,7 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface SmPLUsingCocci extends SmPLCompositeElement {
 
   @NotNull
-  PsiElement getUsing();
+  PsiElement getUsingInclude();
 
   @NotNull
   PsiElement getString();

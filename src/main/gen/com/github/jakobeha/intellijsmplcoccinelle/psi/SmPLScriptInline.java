@@ -14,10 +14,7 @@ public interface SmPLScriptInline extends SmPLCompositeElement {
   SmPLScriptLang getScriptLang();
 
   @NotNull
-  PsiElement getScript();
-
-  @NotNull
-  PsiElement getColon();
+  PsiElement getScriptColon();
 
   @Nullable
   PsiElement getExpr();

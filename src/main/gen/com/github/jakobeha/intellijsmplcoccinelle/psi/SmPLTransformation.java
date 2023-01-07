@@ -10,7 +10,7 @@ public interface SmPLTransformation extends SmPLCompositeElement {
   @NotNull
   SmPLMetavariables getMetavariables();
 
-  @NotNull
+  @Nullable
   SmPLTransformationBody getTransformationBody();
 
 }

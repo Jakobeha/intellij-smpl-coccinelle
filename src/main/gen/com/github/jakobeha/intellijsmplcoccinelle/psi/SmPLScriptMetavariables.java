@@ -8,9 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface SmPLScriptMetavariables extends SmPLCompositeElement {
 
   @Nullable
-  SmPLDep getDep();
-
-  @Nullable
   SmPLRulename getRulename();
 
   @Nullable
@@ -20,16 +17,16 @@ public interface SmPLScriptMetavariables extends SmPLCompositeElement {
   List<SmPLScriptMetadecl> getScriptMetadeclList();
 
   @Nullable
-  PsiElement getFinalize();
+  PsiElement getAtFinalizeColon();
 
   @Nullable
-  PsiElement getInitialize();
+  PsiElement getAtInitializeColon();
 
   @Nullable
-  PsiElement getScript();
+  PsiElement getAtScriptColon();
 
   @Nullable
-  PsiElement getColon();
+  PsiElement getAt();
 
   @Nullable
   PsiElement getDoubleAt();

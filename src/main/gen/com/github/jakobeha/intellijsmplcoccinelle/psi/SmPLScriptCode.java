@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface SmPLScriptCode extends SmPLCompositeElement {
 
-  @NotNull
+  @Nullable
   SmPLScriptBody getScriptBody();
 
   @NotNull

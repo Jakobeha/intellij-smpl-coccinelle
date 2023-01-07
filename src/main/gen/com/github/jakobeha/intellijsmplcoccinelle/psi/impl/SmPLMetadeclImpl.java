@@ -33,9 +33,9 @@ public class SmPLMetadeclImpl extends SmPLCompositeElementImpl implements SmPLMe
   }
 
   @Override
-  @NotNull
+  @Nullable
   public PsiElement getSemi() {
-    return findNotNullChildByType(SEMI);
+    return findChildByType(SEMI);
   }
 
 }

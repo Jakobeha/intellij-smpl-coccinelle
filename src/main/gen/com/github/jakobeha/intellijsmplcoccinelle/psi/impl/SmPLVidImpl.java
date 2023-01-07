@@ -10,14 +10,14 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLTypes.*;
 import com.github.jakobeha.intellijsmplcoccinelle.psi.*;
 
-public class SmPLVirtualCocciImpl extends SmPLCompositeElementImpl implements SmPLVirtualCocci {
+public class SmPLVidImpl extends SmPLCompositeElementImpl implements SmPLVid {
 
-  public SmPLVirtualCocciImpl(@NotNull ASTNode node) {
+  public SmPLVidImpl(@NotNull ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SmPLVisitor visitor) {
-    visitor.visitVirtualCocci(this);
+    visitor.visitVid(this);
   }
 
   @Override
@@ -27,9 +27,15 @@ public class SmPLVirtualCocciImpl extends SmPLCompositeElementImpl implements Sm
   }
 
   @Override
-  @NotNull
-  public PsiElement getVirtualInclude() {
-    return findNotNullChildByType(VIRTUAL_INCLUDE);
+  @Nullable
+  public SmPLId getId() {
+    return findChildByClass(SmPLId.class);
+  }
+
+  @Override
+  @Nullable
+  public PsiElement getVirtual() {
+    return findChildByType(VIRTUAL);
   }
 
 }

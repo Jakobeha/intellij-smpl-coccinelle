@@ -40,14 +40,8 @@ public class SmPLScriptInlineImpl extends SmPLCompositeElementImpl implements Sm
 
   @Override
   @NotNull
-  public PsiElement getScript() {
-    return findNotNullChildByType(SCRIPT);
-  }
-
-  @Override
-  @NotNull
-  public PsiElement getColon() {
-    return findNotNullChildByType(COLON);
+  public PsiElement getScriptColon() {
+    return findNotNullChildByType(SCRIPT_COLON);
   }
 
   @Override

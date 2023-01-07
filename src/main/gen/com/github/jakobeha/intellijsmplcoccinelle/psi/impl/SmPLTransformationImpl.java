@@ -33,9 +33,9 @@ public class SmPLTransformationImpl extends SmPLCompositeElementImpl implements 
   }
 
   @Override
-  @NotNull
+  @Nullable
   public SmPLTransformationBody getTransformationBody() {
-    return findNotNullChildByClass(SmPLTransformationBody.class);
+    return findChildByClass(SmPLTransformationBody.class);
   }
 
 }

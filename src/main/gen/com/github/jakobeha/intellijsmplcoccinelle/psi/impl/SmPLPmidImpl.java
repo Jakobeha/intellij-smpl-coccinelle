@@ -27,9 +27,15 @@ public class SmPLPmidImpl extends SmPLCompositeElementImpl implements SmPLPmid {
   }
 
   @Override
+  @Nullable
+  public SmPLId getId() {
+    return findChildByClass(SmPLId.class);
+  }
+
+  @Override
   @NotNull
-  public List<SmPLId> getIdList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SmPLId.class);
+  public SmPLVid getVid() {
+    return findNotNullChildByClass(SmPLVid.class);
   }
 
   @Override

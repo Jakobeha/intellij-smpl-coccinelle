@@ -7,8 +7,11 @@ import com.intellij.psi.PsiElement;
 
 public interface SmPLPmid extends SmPLCompositeElement {
 
+  @Nullable
+  SmPLId getId();
+
   @NotNull
-  List<SmPLId> getIdList();
+  SmPLVid getVid();
 
   @Nullable
   PsiElement getDot();

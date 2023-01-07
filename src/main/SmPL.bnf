@@ -113,12 +113,15 @@
         word = 'regexp:[a-zA-Z_][a-zA-Z0-9_]*'
         string = 'regexp:"[^"]*"'
         syspath = 'regexp:<[^>]*>'
-        // Dummy required for the live preview for some reason (grammar isn't whitespace-sensitive)
+        // Whitespace and comments
         white_space = 'regexp:\s+'
+        line_comment = 'regexp://[^\r\n]*'
+        block_comment = 'regexp:/\*([^*]|\*[^/])*\*/'
+        doc_comment = 'regexp:///[^\r\n]*|/\*\*([^*]|\*[^/])*\*/'
         // These are actually inferred from lines between the regexps `^@@$` and `^@`
-        TRANSFORMATION_BLOCK = 'regexp:$a'
-        OCAML_BLOCK = 'regexp:$a*'
-        PYTHON_BLOCK = 'regexp:$a*'
+        TRANSFORMATION_BLOCK = 'regexp:[\r\n]:[^\r\n]*([\r\n]:[^\r\n]*)*'
+        OCAML_BLOCK = 'regexp:[\r\n],[^\r\n]*([\r\n],[^\r\n]*)*'
+        PYTHON_BLOCK = 'regexp:[\r\n];[^\r\n]*(?:[\r\n];[^\r\n]*)*'
         // Inferred some other way
         ctype='CTYPE'
         expr='EXPR'
@@ -346,6 +349,8 @@ fn_ctype ::= (generic_ctype | 'void') '*'*
 name_opt_decl ::= decl | ctype | fn_ctype*/
 
 script_body ::= OCAML_BLOCK | PYTHON_BLOCK
+{mixin="com.github.jakobeha.intellijsmplcoccinelle.psi.impl.SmPLCodeBodyBase" implements="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLCodeBody"}
 transformation_body ::= TRANSFORMATION_BLOCK
+{mixin="com.github.jakobeha.intellijsmplcoccinelle.psi.impl.SmPLCodeBodyBase" implements="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLCodeBody"}
 
 private meta commaSeparate ::= <<p>> (',' <<p>>)* {pin(".*")=1}

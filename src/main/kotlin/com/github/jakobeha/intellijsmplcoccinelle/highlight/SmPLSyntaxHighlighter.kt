@@ -12,19 +12,26 @@ import java.util.*
 class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
     override fun getHighlightingLexer(): Lexer = SmPLLexer()
 
-    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> =
-        pack(keys[tokenType], arrayOf())
+    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
+        var highlights = arrayOf<TextAttributesKey>()
+        // Everything is metadata except code blocks
+        if (tokenType != SmPLTypes.PYTHON_BLOCK && tokenType != SmPLTypes.OCAML_BLOCK && tokenType != SmPLTypes.TRANSFORMATION_BLOCK) {
+            highlights = pack(METADATA, highlights)
+        }
+        return pack(keys[tokenType], highlights)
+    }
 
     @Suppress("MemberVisibilityCanBePrivate")
     companion object {
+        val METADATA = TextAttributesKey.createTextAttributesKey("SMPL_METADATA", DefaultLanguageHighlighterColors.TEMPLATE_LANGUAGE_COLOR)
         val INCLUDE_HEADER = TextAttributesKey.createTextAttributesKey("SMPL_INCLUDE_HEADER", DefaultLanguageHighlighterColors.METADATA)
         val VIRTUAL_HEADER = TextAttributesKey.createTextAttributesKey("SMPL_VIRTUAL_HEADER", DefaultLanguageHighlighterColors.METADATA)
-        val METAVARS_AT = TextAttributesKey.createTextAttributesKey("SMPL_AT", DefaultLanguageHighlighterColors.LABEL)
-        val METADECL_HEAD_KEYWORD = TextAttributesKey.createTextAttributesKey("SMPL_METADECL_HEAD_KEYWORD", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
+        val METAVARS_AT = TextAttributesKey.createTextAttributesKey("SMPL_AT", DefaultLanguageHighlighterColors.SEMICOLON)
+        val METADECL_HEAD_KEYWORD = TextAttributesKey.createTextAttributesKey("SMPL_METADECL_HEAD_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
         val METADECL_BODY_KEYWORD = TextAttributesKey.createTextAttributesKey("SMPL_METADECL_BODY_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
-        // val DISABLE_SPECIAL_IDENT = TextAttributesKey.createTextAttributesKey("SMPL_DISABLE_SPECIAL_IDENT", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL)
-        val SCRIPT_LANG = TextAttributesKey.createTextAttributesKey("SMPL_SCRIPT_LANG", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL)
-        val RESERVED_OP = TextAttributesKey.createTextAttributesKey("SMPL_RESERVED_OP", DefaultLanguageHighlighterColors.PREDEFINED_SYMBOL)
+        val SPECIAL_IDENT = TextAttributesKey.createTextAttributesKey("SMPL_SPECIAL_IDENT", DefaultLanguageHighlighterColors.INSTANCE_FIELD)
+        val SCRIPT_LANG = TextAttributesKey.createTextAttributesKey("SMPL_SCRIPT_LANG", DefaultLanguageHighlighterColors.METADATA)
+        val RESERVED_OP = TextAttributesKey.createTextAttributesKey("SMPL_RESERVED_OP", DefaultLanguageHighlighterColors.OPERATION_SIGN)
         val DOT = TextAttributesKey.createTextAttributesKey("SMPL_DOT", DefaultLanguageHighlighterColors.DOT)
         val COMMA = TextAttributesKey.createTextAttributesKey("SMPL_COMMA", DefaultLanguageHighlighterColors.COMMA)
         val SEMICOLON = TextAttributesKey.createTextAttributesKey("SMPL_SEMICOLON", DefaultLanguageHighlighterColors.SEMICOLON)
@@ -34,6 +41,7 @@ class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
         val LINE_COMMENT = TextAttributesKey.createTextAttributesKey("SMPL_LINE_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
         val BLOCK_COMMENT = TextAttributesKey.createTextAttributesKey("SMPL_BLOCK_COMMENT", DefaultLanguageHighlighterColors.BLOCK_COMMENT)
         val DOC_COMMENT = TextAttributesKey.createTextAttributesKey("SMPL_DOC_COMMENT", DefaultLanguageHighlighterColors.DOC_COMMENT)
+        val WORD = TextAttributesKey.createTextAttributesKey("SMPL_WORD", DefaultLanguageHighlighterColors.IDENTIFIER)
         val INTEGER = TextAttributesKey.createTextAttributesKey("SMPL_INTEGER", DefaultLanguageHighlighterColors.NUMBER)
         val STRING = TextAttributesKey.createTextAttributesKey("SMPL_STRING", DefaultLanguageHighlighterColors.STRING)
         val SYSPATH = TextAttributesKey.createTextAttributesKey("SMPL_SYSPATH", DefaultLanguageHighlighterColors.STRING)
@@ -117,7 +125,6 @@ class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
                 METADECL_BODY_KEYWORD,
                 SmPLTypes.DEPENDS_ON,
                 SmPLTypes.USING,
-                SmPLTypes.VIRTUAL,
                 SmPLTypes.DISABLE,
                 SmPLTypes.EVER,
                 SmPLTypes.NEVER,
@@ -126,6 +133,8 @@ class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
                 SmPLTypes.FORALL,
                 SmPLTypes.SCRIPT_COLON
             )
+
+            keysPutEach(SPECIAL_IDENT, SmPLTypes.VIRTUAL)
 
             keysPutEach(
                 SCRIPT_LANG,
@@ -157,12 +166,13 @@ class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
             keysPutEach(LINE_COMMENT, SmPLTypes.LINE_COMMENT)
             keysPutEach(BLOCK_COMMENT, SmPLTypes.BLOCK_COMMENT)
             keysPutEach(DOC_COMMENT, SmPLTypes.DOC_COMMENT)
+            keysPutEach(INTEGER, SmPLTypes.INTEGER)
+            keysPutEach(WORD, SmPLTypes.WORD)
             keysPutEach(STRING, SmPLTypes.STRING)
             keysPutEach(SYSPATH, SmPLTypes.SYSPATH)
-            keysPutEach(INTEGER, SmPLTypes.INTEGER)
             // keysPutEach(ESCAPE, SmPLTypes.ESCAPE)
         }
 
-        val ATTRIBUTE_KEYS: Array<TextAttributesKey> = keys.values.toTypedArray()
+        val ATTRIBUTE_KEYS: Array<TextAttributesKey> = (listOf(METADATA) + keys.values).toTypedArray()
     }
 }

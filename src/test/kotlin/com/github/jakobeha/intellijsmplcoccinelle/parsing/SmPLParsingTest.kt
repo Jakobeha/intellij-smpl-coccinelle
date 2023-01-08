@@ -13,4 +13,5 @@ class SmPLParsingTest : ParsingTestCase("parsing", SmPLFileType.defaultExtension
     private fun doTest() { doTest(true, true) }
 
     fun testAction() { doTest() }
+    fun testDeviceAttr() { doTest() }
 }

@@ -1,8 +1,4 @@
-/*
- * MODIFIED from generated SmPL.bnf lexer:
- * - Removed transformation/skip toksens
- * - Removed redundant (our) whitespace token
- */
+/* MODIFIED from generated SmPL.bnf lexer. Do not replace */
 package com.github.jakobeha.intellijsmplcoccinelle.parsing;
 
 import com.github.jakobeha.intellijsmplcoccinelle.injection.SmPLCodeLang;import com.intellij.lexer.FlexLexer;
@@ -43,8 +39,8 @@ import static com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLTypes.*;
 
 WHITE_SPACE=\s+
 
-LINE_COMMENT="//"[^\R]*
-BLOCK_COMMENT="/"\*([^*]|\*[^/])*\*"/"
+LINE_COMMENT="//"([^/][^\R]*)?
+BLOCK_COMMENT="/"\*[^*]([^*]|\*[^/])*\*"/" | "/**/"
 DOC_COMMENT="///"[^\R]*|"/"\*\*([^*]|\*[^/])*\*"/"
 
 DIGITS=[0-9]+
@@ -109,7 +105,7 @@ SYSPATH=<[^>]*>
 }
 
 <METAVARS,SCRIPT_METAVARS> {
-  ^ "@@"                      { yybegin(CODE_BLOCK); return DOUBLE_AT; }
+  ^ "@@" [\s--\R]* \R?        { yybegin(CODE_BLOCK); return DOUBLE_AT; }
   "extends"                   { return EXTENDS; }
   "depends on"                { return DEPENDS_ON; }
   "using"                     { return USING; }
@@ -150,9 +146,8 @@ SYSPATH=<[^>]*>
   ":"                         { return COLON; }
 }
 
-<CODE_BLOCK> {
 // Matches every line until we reach one that begins with '@', but not the '@' itself, or until we reach EOF
-// Matches epsilon but will always terminate, since this changes to AFTER_CODE_BLOCK which does not match epsilon.
+<CODE_BLOCK> {
   ~(\R @)                     { this.yypushback(1); return this.exitCodeBlock(); }
 // Hack: we know the lexer has buffered the entire input because it must have read everything to not find ~(\R @)
 // So zzEndRead (end of buffer) points to end of file

@@ -10,6 +10,8 @@ import com.intellij.psi.tree.IElementType
 import java.util.*
 
 class SmPLSyntaxHighlighter : SyntaxHighlighterBase() {
+    // TODO: Maybe use separate lexer which also lexes splices (we don't parse lexing with splices due to SmPL's weird rules
+    //   with added / deleted lines creating multiple parse trees) and embedded languages
     override fun getHighlightingLexer(): Lexer = SmPLLexer()
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {

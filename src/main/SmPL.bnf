@@ -1,7 +1,10 @@
 /// SPEC: https://coccinelle.gitlabpages.inria.fr/website/docs/main_grammar.html
 /// Note that this parser only parses the metavariables and script_metavariables.
-/// The actual script or transformation code is handed to a language-specific parser,
-/// after we parse and remove the splices
+/// The actual script or transformation code is handed to a language-specific parser.
+///
+/// The transformation language requires a custom parser as the splices are deeply-embedded
+/// (see: unions and disjunctions, which are non-trivial to distinguish from unary AND/OR binop)
+/// AND we need to handle added / deleted lines creating multiple parse trees on the same code
 {
     parserClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLParser"
     parserUtilClass="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLParserUtilBase"
@@ -309,50 +312,6 @@ id ::=
     '(' id ('|' id)+ ')' |
     '(' id ('&' id)+ ')'
 integer ::= digits | '-' digits
-
-/*ctypes ::= <<commaSeparate ctype>>
-ctype ::=
-    [const_vol] generic_ctype '*'* |
-    [const_vol] 'void' '*' + |
-    '(' ctype ('|' ctype)* ')'
-const_vol ::= 'const' | 'volatile'
-generic_ctype ::=
-    ctype_qualif |
-    [ctype_qualif] 'char' |
-    [ctype_qualif] 'short' |
-    [ctype_qualif] 'short' 'int' |
-    [ctype_qualif] 'int' |
-    [ctype_qualif] 'long' |
-    [ctype_qualif] 'long' 'int' |
-    [ctype_qualif] 'long' 'long' |
-    [ctype_qualif] 'long' 'long' 'int' |
-    'double' |
-    'long' 'double' |
-    'float' |
-    'long' 'double complex' |
-    'double complex' |
-    'float complex' |
-    'size_t' |
-    'ssize_t' |
-    'ptrdiff_t' |
-    'enum' id { <<commaSeparate (dot_expr | '...' [exp_whencode])>> [','] } |
-    ['struct' | 'union'] id ['{' struct_decl_list* '}'] |
-    'typeof' '(' exp ')' |
-    'typeof' '(' ctype ')'
-ctype_qualif ::= 'unsigned' | 'signed'
-struct_decl_list ::=
-    struct_decl [struct_decl_list] |
-    '...' ['when' '!=' struct_decl] [continue_struct_decl_list]
-continue_struct_decl_list ::= struct_decl [struct_decl_list]
-struct_decl ::= struct_decl_ ';'
-private struct_decl_ ::=
-    ctype d_ident |
-    fn_ctype '(' '*' d_ident ')' '(' <<commaSeparate (name_opt_decl | '...')>> ')'
-    {pin(".*")=2;recoverWhile=struct_decl_recover}
-private struct_decl_recover ::= !(';' | '}')
-d_ident ::= id ['[' expr ']'] '*'
-fn_ctype ::= (generic_ctype | 'void') '*'*
-name_opt_decl ::= decl | ctype | fn_ctype*/
 
 script_body ::= OCAML_BLOCK | PYTHON_BLOCK
 {mixin="com.github.jakobeha.intellijsmplcoccinelle.psi.impl.SmPLCodeBodyBase" implements="com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLCodeBody"}

@@ -1,0 +1,417 @@
+/// SPEC: https://coccinelle.gitlabpages.inria.fr/website/docs/main_grammar.html
+/// Parse SmPL C transformation
+{
+    parserClass="com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCParser"
+    parserUtilClass="com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCParserUtilBase"
+
+    implements="com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCCompositeElement"
+    extends="com.github.jakobeha.intellijsmplcoccinelle.c.psi.impl.SmPLCCompositeElementImpl"
+
+    psiClassPrefix="SmPLC"
+    psiImplClassSuffix="Impl"
+    psiPackage="com.github.jakobeha.intellijsmplcoccinelle.c.psi"
+    psiImplPackage="com.github.jakobeha.intellijsmplcoccinelle.c.psi.impl"
+
+    elementTypeHolderClass="com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCTypes"
+    elementTypeClass="com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCElementType"
+    tokenTypeClass="com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCTokenType"
+
+    generate=[tokenAccessors="yes"]
+
+    tokens = [
+        // Punctuation
+        nest_reg_open='<...'
+        nest_reg_close='...>'
+        nest_plus_open='<+...'
+        nest_plus_close='...+>'
+        double_ellipsis='......'
+        ellipsis='...'
+        back_lparen='\('
+        back_rparen='\)'
+        back_or='\|'
+        lparen='('
+        rparen=')'
+        lbrack='['
+        rbrack=']'
+        lbrace='{'
+        rbrace='}'
+        semicolon=';'
+        comma=','
+        colon=':'
+        dot='.'
+        arrow='->'
+        question='?'
+        equals='='
+        minus_equals='-='
+        plus_equals='+='
+        times_equals='*='
+        divide_equals='/='
+        mod_equals='%='
+        and_equals='&='
+        or_equals='|='
+        xor_equals='^='
+        lshift_equals='<<='
+        rshift_equals='>>='
+        times='*'
+        divide='/'
+        mod='%'
+        plus='+'
+        minus='-'
+        lshift='<<'
+        rshift='>>'
+        xor='^'
+        and='&'
+        or='|'
+        lt='<'
+        gt='>'
+        le='<='
+        ge='>='
+        eq='=='
+        ne='!='
+        double_and='&&'
+        double_or='||'
+        not='!'
+        tilde='~'
+        increment='++'
+        decrement='--'
+        concat='##'
+        // Reserved IDs. Should be tokens for IntelliJ reasons. Gives us a nicer
+        // PSI tree as side effect.
+        ATTRIBUTE='__attribute__'
+        WHEN='when'
+        ANY='any'
+        STRICT='strict'
+        FORALL='forall'
+        EXISTS='exists'
+        TRUE='true'
+        FALSE='false'
+        RETURN='return'
+        BREAK='break'
+        CONTINUE='continue'
+        GOTO='goto'
+        IF='if'
+        ELSE='else'
+        SWITCH='switch'
+        CASE='case'
+        DEFAULT='default'
+        WHILE='while'
+        DO='do'
+        FOR='for'
+        INLINE='inline'
+        STATIC='static'
+        AUTO='auto'
+        REGISTER='register'
+        EXTERN='extern'
+        VOID='void'
+        TYPEDEF='typedef'
+        STRUCT='struct'
+        UNION='union'
+        ENUM='enum'
+        SIZEOF='sizeof'
+        VOLATILE='volatile'
+        CONST='const'
+        CHAR='char'
+        SHORT='short'
+        INT='int'
+        LONG='long'
+        SIGNED='signed'
+        UNSIGNED='unsigned'
+        FLOAT='float'
+        DOUBLE='double'
+        BOOL='bool'
+        FLOAT_COMPLEX='float complex'
+        DOUBLE_COMPLEX='double complex'
+        SIZE_T='size_t'
+        SSIZE_T='ssize_t'
+        PTRDIFF_T='ptrdiff_t'
+        TYPEOF='typeof'
+        HASH_INCLUDE='#include'
+        HASH_DEFINE='#define'
+        HASH_UNDEF='#undef'
+        HASH_PRAGMA='#pragma'
+        // Literals
+        digits = 'regexp:[0-9]+'
+        word = 'regexp:[a-zA-Z_][a-zA-Z0-9_]*'
+        string = 'regexp:"[^"]*"'
+        // Whitespace and comments
+        white_space = 'regexp:\s+'
+        line_comment = 'regexp://[^\r\n]*'
+        block_comment = 'regexp:/\*([^*]|\*[^/])*\*/'
+        doc_comment = 'regexp:///[^\r\n]*|/\*\*([^*]|\*[^/])*\*/'
+    ]
+
+    name(".*decl")="declaration"
+    extends(".*decl")=decl
+    name(".*stmt")="statement"
+    extends(".*stmt")=stmt
+    name(".*expr")="expression"
+    extends(".*expr")=expr
+    name(".*type")="type"
+    extends(".*type")=expr
+}
+
+transformation ::= include+ | <<optDotSeq top when>>
+
+include ::= '#include' STRING
+top ::= expr |
+    decl_stmt+ |
+    fundecl
+when ::=
+    when_ne |
+    when_eq |
+    when_any |
+    when_true_ne |
+    when_false_ne
+when_ne ::= 'when' '!=' when_code {pin=2}
+when_eq ::= 'when' '=' rule_elem_stmt {pin=2}
+when_any ::= 'when' <<commaSeparate any_strict>>
+when_true_ne ::= 'when' 'true' '!=' expr {pin=2}
+when_false_ne ::= 'when' 'false' '!=' expr {pin=2}
+when_code ::= <<optDotSeq decl_stmt+ when>> | <<optDotSeq expr when>>
+rule_elem_stmt ::= single_rule_elem_stmt | multi_rule_elem_stmt
+single_rule_elem_stmt ::= single_rule_elem_stmt_ ';' {pin=1}
+private single_rule_elem_stmt_ ::=
+    one_decl |
+    expr |
+    single_rule_elem_stmt_return
+    single_rule_elem_stmt_break
+    single_rule_elem_stmt_continue
+    {recoverWhile=semi_recover}
+single_rule_elem_stmt_return ::= 'return' [expr] {pin=1}
+single_rule_elem_stmt_break ::= 'break'
+single_rule_elem_stmt_continue ::= 'continue'
+multi_rule_elem_stmt ::= '\(' rule_elem_stmt ('\|' rule_elem_stmt)+ '\)' {pin=1}
+any_strict ::= 'any' | 'strict' | 'forall' | 'exists'
+private meta optDotSeq ::=
+    ['...' <<p>>*] <<p2>> ('...' <<p>>* <<p2>>)* ['...' <<p>>*]
+
+fundecl ::= [fn_ctype] funinfo* funid '(' [<<paramSeq param ()>>] ')' '{' [stmt_seq] '}'
+funproto ::= fn_ctype funinfo* funid '(' [<<paramSeq param ()>>] ')'
+funinfo ::= 'inline' | storage
+storage ::= 'static' | 'auto' | 'register' | 'extern'
+funid ::= id | <<conjunct funid>>
+param ::= type id | WORD | '......' {pin(".*")=1}
+decl ::=
+    decl_type_id |
+    decl_fn_type |
+    'void' |
+    WORD
+decl_type_id ::= ctype id
+decl_fn_type ::= fn_ctype '(' '*' id ')' '(' <<paramSeq name_opt_decl ()>> ')' {pin=2}
+
+meta paramSeq ::= <<commaSeparate (<<p>> | '...' [<<p2>>])>>
+
+decl_var ::= single_decl_var | <<conjunct decl_var>> | <<disjunct decl_var>>
+single_decl_var ::= single_decl_var_ ';' {pin=1}
+private single_decl_var_ ::=
+    common_decl_ |
+    single_decl_idents |
+    // TODO: these may be the same (and some of the other rules, since ctype can match id)
+    single_decl_idents2 |
+    single_decl_fn_init |
+    single_decl_typedef |
+    single_decl_typedef_expr
+    {recoverWhile=semi_recover}
+single_decl_idents ::= [storage] ctype <<commaSeparate d_ident>>
+single_decl_idents2 ::= [storage] [const_vol] id <<commaSeparate d_ident>>
+single_decl_fn_init ::= [storage] fn_ctype '(' '*' d_ident ')' '(' <<paramSeq name_opt_decl ()>> ')' '=' initialize {pin=10}
+single_decl_typedef ::= 'typedef' ctype <<commaSeparate typedef_ident>>
+single_decl_typedef_expr ::= 'typedef' ctype typedef_ident upto_two_exprs
+private upto_two_exprs ::= expr expr | [expr]
+one_decl ::= single_one_decl | <<conjunct one_decl>> | <<disjunct one_decl>>
+single_one_decl ::= single_one_decl_ ';' {pin=1}
+private single_one_decl_ ::=
+    common_decl_ |
+    single_one_decl_ident |
+    single_one_decl_ident2
+    OR(one_decl) |
+    AND(one_decl)
+    {recoverWhile=semi_recover}
+single_one_decl_ident ::= [storage] ctype id [attribute]
+single_one_decl_ident2 ::= [storage] [const_vol] id d_ident
+attribute ::= '__attribute__' '(' '(' <<commaSeparate WORD>> ')' ')' {pin=1}
+private common_decl_ ::=
+    ctype |
+    funproto |
+    decl_ident_init |
+    decl_ident2_init |
+    decl_fn |
+    decl_meta
+decl_ident_init ::= [storage] ctype d_ident [attribute] '=' initialize {pin=5}
+decl_ident2_init ::= [storage] [const_vol] id d_ident [attribute] '=' initialize {pin=6}
+decl_fn ::= [storage] fn_ctype '(' '*' d_ident ')' '(' <<paramSeq name_opt_decl ()>> ')'
+decl_meta ::= WORD '(' [<<commaSeparate expr>>] ')'
+initialize ::=
+    dot_expr |
+    WORD |
+    init_list
+init_list ::= '{' [<<commaSeparate init_list_elem>>] '}' {pin=1}
+init_list_elem ::=
+    dot_expr |
+    init_list_eq |
+    init_list_colon
+    WORD
+init_list_eq ::= designator '=' initialize {pin=1}
+init_list_colon ::= id ':' dot_expr {pin=1}
+designator ::=
+    '.' id |
+    '[' dot_expr ']' |
+    '[' dot_expr '...' dot_expr ']'
+
+stmt ::=
+    directive |
+    WORD |
+    [expr] ';' |
+    stmt_if |
+    stmt_for |
+    stmt_while |
+    stmt_do |
+    stmt_meta_iter |
+    stmt_switch |
+    stmt_return |
+    stmt_block |
+    stmt_break |
+    stmt_continue |
+    stmt_label |
+    stmt_goto |
+    stmt_nest_decl |
+    stmt_nest_expr
+    {recoverWhile=stmt_recover}
+stmt_if ::= 'if' '(' dot_expr ')' single_stmt ['else' single_stmt] {pin=1}
+stmt_for ::= 'for' '(' [dot_expr] ';' [dot_expr] ';' [dot_expr] ')' single_stmt {pin=1}
+stmt_while ::= 'while' '(' dot_expr ')' single_stmt {pin=1}
+stmt_do ::= 'do' single_stmt 'while' '(' dot_expr ')' ';' {pin=1}
+stmt_meta_iter ::= iter_ident '(' dot_expr* ')' single_stmt
+stmt_switch ::= 'switch' '(' [dot_expr] ')' '{' case_line* '}' {pin=1}
+stmt_return ::= 'return' [dot_expr] ';' {pin=1}
+stmt_block ::= '{' [stmt_seq] '}' {pin=1}
+stmt_break ::= 'break' ';' {pin=1}
+stmt_continue ::= 'continue' ';' {pin=1}
+stmt_label ::= id ':'
+stmt_goto ::= 'goto' id {pin=1}
+stmt_nest_decl ::= <<nest decl_stmt+ when>>
+stmt_nest_expr ::= <<nest expr when>>
+directive ::=
+    include |
+    define |
+    define_func |
+    undef |
+    pragma |
+    pragma_ellipsis
+define ::= '#define' id [top]
+define_func ::= '#define' id '(' <<paramSeq id ()>> ')' [top] {pin=3}
+undef ::= '#undef' id {pin=1}
+pragma ::= '#pragma' id id+ {pin=3}
+pragma_ellipsis ::= '#pragma' id '...' {pin=3}
+single_stmt ::= stmt | <<conjunct stmt>> | <<disjunct stmt>>
+decl_stmt ::=
+    WORD |
+    decl_var |
+    stmt |
+    expr |
+    <<conjunct stmt_seq>> |
+    <<disjunct stmt_seq>>
+stmt_seq ::=
+    decl_stmt* [<<dotSeq (decl_stmt+ | expr) when>> decl_stmt*]
+case_line ::= case_line_default | case_line_case
+case_line_default ::= 'default' ':' stmt_seq {pin=1}
+case_line_case ::= 'case' dot_expr ':' stmt_seq {pin=1}
+iter_ident ::= WORD
+meta conjunct ::= '(' <<p>> ('|' <<p>>)* ')' {pin=3 pin(".*")=1}
+meta disjunct ::= '(' <<p>> ('&' <<p>>)* ')' {pin=3 pin(".*")=1}
+meta dotSeq ::= '...' [<<p2>>] (<<p>> '...' [<<p2>>])* {pin=1}
+meta nest ::=
+    '<...' [<<p2>>] <<p>> ('...' [<<p2>>] <<p>>)* '...>' |
+    '<+...' [<<p2>>] <<p>> ('...' [<<p2>>] <<p>>)* '...+>'
+    {pin(".*")=1}
+
+expr ::= <<expr_rec expr>>
+nest_expr ::= <<expr_rec nest_expr>> | <<nest nest_expr exp_whencode>>
+dot_expr ::=
+    <<expr_rec dot_expr>> |
+    <<nest dot_expr exp_whencode>> |
+    '...' [exp_whencode]
+meta expr_rec ::=
+    <<expr_head <<p>>>> <<expr_tail <<p>>>>*
+meta expr_head ::=
+    unary_op <<p>> |
+    '(' type ')' <<p>> |
+    id |
+    '(' type ')' '{' <<commaSeparate init_list_elem>> '}' |
+    const |
+    '(' dot_expr ')' |
+    <<conjunct <<p>>>>
+    <<disjunct <<p>>>>
+    {pin(".*")=4}
+meta expr_tail ::=
+    WORD <<p>> |
+    assign_op <<p>> |
+    '++' |
+    '--' |
+    bin_op <<p>> |
+    '?' dot_expr ':' <<p>> |
+    dot_expr |
+    '.' id |
+    '->' id |
+    '(' [<<paramSeq arg exp_whencode>>] ')'
+    {pin(".*")=1}
+arg ::= nest_expr
+exp_whencode ::= 'when' '!=' expr {pin=1}
+assign_op ::= '=' | '-=' | '+=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=' | '>>='
+bin_op ::= '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '^' | '&' | '|' | '<' | '>' | '<=' | '>=' | '==' | '!=' | '&&' | '||'
+unary_op ::= '++' | '--' | '&' | '*' | '+' | '-' | '!'
+
+const ::= STRING | INTEGER | '...'
+id ::= WORD | <<conjunct WORD>> | <<disjunct WORD>>
+typedef_ident ::= id
+type ::= ctype | WORD
+
+ctype ::=
+    [const_vol] generic_ctype '*'* |
+    [const_vol] 'void' '*'+ |
+    '(' ctype ('|' ctype)* ')'
+const_vol ::= 'const' | 'volatile'
+generic_ctype ::=
+    ctype_qualif |
+    [ctype_qualif] 'char' |
+    [ctype_qualif] 'short' |
+    [ctype_qualif] 'short' 'int' |
+    [ctype_qualif] 'int' |
+    [ctype_qualif] 'long' |
+    [ctype_qualif] 'long' 'int' |
+    [ctype_qualif] 'long' 'long' |
+    [ctype_qualif] 'long' 'long' 'int' |
+    'double' |
+    'long' 'double' |
+    'float' |
+    'long' 'double complex' |
+    'double complex' |
+    'float complex' |
+    'size_t' |
+    'ssize_t' |
+    'ptrdiff_t' |
+    ctype_enum |
+    ctype_struct_union |
+    ctype_typeof
+ctype_enum ::= 'enum' id { <<commaSeparate (dot_expr | '...' [exp_whencode])>> [','] } {pin=1}
+ctype_struct_union ::= ['struct' | 'union'] id ['{' struct_decl_list* '}']
+ctype_typeof ::= 'typeof' '(' (expr | ctype) ')'
+ctype_qualif ::= 'unsigned' | 'signed'
+struct_decl_list ::=
+    struct_decl [struct_decl_list] |
+    '...' ['when' '!=' struct_decl] [continue_struct_decl_list]
+continue_struct_decl_list ::= struct_decl [struct_decl_list]
+struct_decl ::= struct_decl_ ';'
+private struct_decl_ ::=
+    struct_decl_reg |
+    struct_decl_fn
+    {recoverWhile=stmt_recover}
+struct_decl_reg ::= ctype d_ident {pin=2}
+struct_decl_fn ::= fn_ctype '(' '*' d_ident ')' '(' <<commaSeparate (name_opt_decl | '...')>> ')' {pin=2}
+d_ident ::= id ['[' expr ']'] '*' {pin=1}
+fn_ctype ::= (generic_ctype | 'void') '*'*
+name_opt_decl ::= decl | ctype | fn_ctype
+private meta commaSeparate ::= <<p>> (',' <<p>>)* {pin(".*")=1}
+
+private semi_recover ::= !';'
+private stmt_recover ::= !(';' | '{' | '}')

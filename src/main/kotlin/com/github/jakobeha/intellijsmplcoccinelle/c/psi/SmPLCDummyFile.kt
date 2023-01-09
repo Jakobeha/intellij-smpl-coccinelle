@@ -9,5 +9,5 @@ import com.github.jakobeha.intellijsmplcoccinelle.c.SmPLCDummyFileType
 
 class SmPLCDummyFile(viewProvider: FileViewProvider) : PsiFileBase(viewProvider, SmPLC) {
     override fun getFileType(): FileType = SmPLCDummyFileType
-    override fun toString(): String = "C (SmPL) Dummy File"
+    override fun toString(): String = "SmPL C Dummy File"
 }

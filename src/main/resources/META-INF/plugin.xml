@@ -6,6 +6,8 @@
     <vendor>jakobeha</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <!-- For injection tests and maybe some more, see https://blog.jetbrains.com/platform/2019/06/java-functionality-extracted-as-a-plugin/ -->
+    <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
         <!-- Language support -->
@@ -18,7 +20,16 @@
         <editorHighlighterProvider filetype="SmPL (coccinelle)" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.highlight.SmPLEditorHighlighter$Provider" />
         <lang.syntaxHighlighterFactory language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.highlight.SmPLSyntaxHighlighter$Factory" />
 
-        <!-- Language inject (C) -->
+        <fileType name="SmPL C Dummy File" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.c.SmPLCDummyFileType"
+                  fieldName="INSTANCE" language="SmPL C" extensions="coccic"/>
+        <lang.commenter language="SmPL C"
+                        implementationClass="com.github.jakobeha.intellijsmplcoccinelle.c.SmPLCCommenter" />
+        <completion.contributor language="SmPL" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.c.completion.SmPLCKeywordCompletionContributor"/>
+        <lang.parserDefinition language="SmPL C" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.c.parsing.SmPLCParserDefinition" />
+        <editorHighlighterProvider filetype="SmPL C Dummy File" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.c.highlight.SmPLCEditorHighlighter$Provider" />
+        <lang.syntaxHighlighterFactory language="SmPL C" implementationClass="com.github.jakobeha.intellijsmplcoccinelle.c.highlight.SmPLCSyntaxHighlighter$Factory" />
+
+        <!-- Language inject -->
         <multiHostInjector implementation="com.github.jakobeha.intellijsmplcoccinelle.injection.SmPLMultiHostInjector"/>
 
         <!-- File Templates -->

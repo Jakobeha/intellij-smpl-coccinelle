@@ -153,8 +153,9 @@
 transformation ::= include+ | <<optDotSeq top when_cond>>
 
 include ::= '#include' STRING
-top ::= expr |
+top ::=
     decl_stmt+ |
+    expr |
     fundecl
 when_cond ::= 'when' when_cond_ {pin=1}
 private when_cond_ ::=
@@ -184,19 +185,19 @@ single_rule_elem_stmt_continue ::= 'continue'
 multi_rule_elem_stmt ::= '\(' rule_elem_stmt ('\|' rule_elem_stmt)+ '\)' {pin=1}
 any_strict ::= 'any' | 'strict' | 'forall' | 'exists'
 private meta optDotSeq ::=
-    ['...' <<p>>*] <<p2>> ('...' <<p>>* <<p2>>)* ['...' <<p>>*]
+    <<args_are <<p>> <<p2>>>> ['...' <<p2>>*] <<p>> ('...' <<p2>>* <<p>>)* ['...' <<p2>>*]
 
 fundecl ::= [fn_ctype] funinfo* funid '(' [<<paramSeq param ()>>] ')' '{' [stmt_seq] '}'
 funproto ::= fn_ctype funinfo* funid '(' [<<paramSeq param ()>>] ')'
 funinfo ::= 'inline' | storage
 storage ::= 'static' | 'auto' | 'register' | 'extern'
 funid ::= id | <<conjunct funid>>
-param ::= type id | WORD | '......' {pin(".*")=1}
+param ::= type id | meta_id | '......' {pin(".*")=1}
 decl ::=
     decl_type_id |
     decl_fn_type |
     'void' |
-    WORD
+    meta_id
 decl_type_id ::= ctype id
 decl_fn_type ::= fn_ctype '(' '*' id ')' '(' <<paramSeq name_opt_decl ()>> ')' {pin=2}
 
@@ -241,17 +242,18 @@ private common_decl_ ::=
 decl_ident_init ::= [storage] ctype d_ident [attribute] '=' initialize {pin=5}
 decl_ident2_init ::= [storage] [const_vol] id d_ident [attribute] '=' initialize {pin=6}
 decl_fn ::= [storage] fn_ctype '(' '*' d_ident ')' '(' <<paramSeq name_opt_decl ()>> ')'
-decl_meta ::= WORD '(' [<<commaSeparate expr>>] ')'
+decl_meta ::= decl_ident '(' [<<commaSeparate expr>>] ')'
+decl_ident ::= meta_id | id
 initialize ::=
     dot_expr |
-    WORD |
+    meta_id |
     init_list
 init_list ::= '{' [<<commaSeparate init_list_elem>>] '}' {pin=1}
 init_list_elem ::=
     dot_expr |
     init_list_eq |
-    init_list_colon
-    WORD
+    init_list_colon |
+    meta_id
 init_list_eq ::= designator '=' initialize {pin=1}
 init_list_colon ::= id ':' dot_expr {pin=1}
 designator ::=
@@ -261,7 +263,6 @@ designator ::=
 
 stmt ::=
     directive |
-    WORD |
     [expr] ';' |
     stmt_if |
     stmt_for |
@@ -275,6 +276,7 @@ stmt ::=
     stmt_continue |
     stmt_label |
     stmt_goto |
+    meta_id |
     stmt_nest_decl |
     stmt_nest_expr
     {recoverWhile=stmt_recover}
@@ -306,9 +308,8 @@ pragma ::= '#pragma' id id+ {pin=3}
 pragma_ellipsis ::= '#pragma' id '...' {pin=3}
 single_stmt ::= stmt | <<conjunct stmt>> | <<disjunct stmt>>
 decl_stmt ::=
-    WORD |
-    decl_var |
     stmt |
+    decl_var |
     expr |
     <<conjunct stmt_seq>> |
     <<disjunct stmt_seq>>
@@ -317,14 +318,14 @@ stmt_seq ::=
 case_line ::= case_line_default | case_line_case
 case_line_default ::= 'default' ':' stmt_seq {pin=1}
 case_line_case ::= 'case' dot_expr ':' stmt_seq {pin=1}
-iter_ident ::= WORD
+iter_ident ::= meta_id | id
 meta conjunct ::= '(' <<p>> ('|' <<p>>)* ')' {pin=3 pin(".*")=1}
 meta disjunct ::= '(' <<p>> ('&' <<p>>)* ')' {pin=3 pin(".*")=1}
-meta dotSeq ::= '...' [<<p2>>] (<<p>> '...' [<<p2>>])* {pin=1}
+meta dotSeq ::= <<args_are <<p>> <<p2>>>> '...' [<<p2>>] (<<p>> '...' [<<p2>>])* {pin=2}
 meta nest ::=
-    '<...' [<<p2>>] <<p>> ('...' [<<p2>>] <<p>>)* '...>' |
-    '<+...' [<<p2>>] <<p>> ('...' [<<p2>>] <<p>>)* '...+>'
-    {pin(".*")=1}
+    <<args_are <<p>> <<p2>>>> '<...' [<<p2>>] <<p>> ('...' [<<p2>>] <<p>>)* '...>' |
+    <<args_are <<p>> <<p2>>>> '<+...' [<<p2>>] <<p>> ('...' [<<p2>>] <<p>>)* '...+>'
+    {pin(".*")=2}
 
 expr ::= <<expr_rec expr>>
 nest_expr ::= <<expr_rec nest_expr>> | <<nest nest_expr exp_whencode>>
@@ -337,24 +338,25 @@ meta expr_rec ::=
 meta expr_head ::=
     unary_op <<p>> |
     '(' type ')' <<p>> |
-    id |
     '(' type ')' '{' <<commaSeparate init_list_elem>> '}' |
     constant |
     '(' dot_expr ')' |
+    meta_id |
+    id |
     <<conjunct <<p>>>>
     <<disjunct <<p>>>>
     {pin(".*")=4}
 meta expr_tail ::=
-    WORD <<p>> |
+    meta_id <<p>> |
     assign_op <<p>> |
     '++' |
     '--' |
     bin_op <<p>> |
     '?' dot_expr ':' <<p>> |
-    dot_expr |
     '.' id |
     '->' id |
-    '(' [<<paramSeq arg exp_whencode>>] ')'
+    '(' [<<paramSeq arg exp_whencode>>] ')' |
+    dot_expr
     {pin(".*")=1}
 arg ::= nest_expr
 exp_whencode ::= 'when' '!=' expr {pin=1}
@@ -362,11 +364,7 @@ assign_op ::= '=' | '-=' | '+=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=
 bin_op ::= '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '^' | '&' | '|' | '<' | '>' | '<=' | '>=' | '==' | '!=' | '&&' | '||'
 unary_op ::= '++' | '--' | '&' | '*' | '+' | '-' | '!'
 
-constant ::= STRING | INTEGER | '...'
-id ::= WORD | <<conjunct WORD>> | <<disjunct WORD>>
-typedef_ident ::= id
-type ::= ctype | WORD
-
+type ::= ctype | meta_id
 ctype ::=
     [const_vol] generic_ctype '*'* |
     [const_vol] 'void' '*'+ |
@@ -414,5 +412,15 @@ fn_ctype ::= (generic_ctype | 'void') '*'*
 name_opt_decl ::= decl | ctype | fn_ctype
 private meta commaSeparate ::= <<p>> (',' <<p>>)* {pin(".*")=1}
 
+constant ::= STRING | INTEGER | '...'
+id ::= meta_id | WORD | <<conjunct id>> | <<disjunct id>>
+typedef_ident ::= id
+meta_id ::= WORD '@' WORD {pin=2}
+
 private semi_recover ::= !';'
 private stmt_recover ::= !(';' | '{' | '}')
+
+/// Necessary to specify parameter order in generated
+///   (default order is first arg but sometimes we put the second arg first, so we need <<args_are <<p>> <<p2>>>>;
+///    if <<p2>> comes before <<p>> in the definition to ensure that <<p>> is the first argument and not <<p2>>)
+meta args_are ::= ()

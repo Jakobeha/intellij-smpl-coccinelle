@@ -6,11 +6,18 @@ import com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLTransformationBody
 import com.intellij.lang.Language
 import com.intellij.lang.injection.MultiHostInjector
 import com.intellij.lang.injection.MultiHostRegistrar
+import com.intellij.openapi.project.PossiblyDumbAware
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiElement
 
 
-class SmPLMultiHostInjector : MultiHostInjector {
+class SmPLMultiHostInjector : MultiHostInjector, PossiblyDumbAware {
+    // TODO: make into a setting
+    //   SmPL should be dumb-aware by default because the majority of the file's code is injected, and a besides the
+    //   transformation code (which could be lexed within the host lexer) a large portion is injected Python and OCaml.
+    //   But users may still want to disable especially if there this injection has large overhead
+    override fun isDumbAware(): Boolean = true
+
     @Suppress("UNCHECKED_CAST")
     override fun elementsToInjectIn(): List<Class<out SmPLCodeBody>> = listOf(
         SmPLTransformationBody::class.java as Class<out SmPLCodeBody>,
@@ -23,13 +30,13 @@ class SmPLMultiHostInjector : MultiHostInjector {
         }
     }
 
-    private val C_LANG = Language.findLanguageByID("C")
+    private val SMPL_C_LANG = Language.findLanguageByID("SmPL C")
     private val OCAML_LANG = Language.findLanguageByID("OCaml")
     private val PYTHON_LANG = Language.findLanguageByID("Python")
 
     private val SmPLCodeLang.language: Language?
         get() = when (this) {
-            SmPLCodeLang.Transformation -> C_LANG
+            SmPLCodeLang.Transformation -> SMPL_C_LANG
             SmPLCodeLang.Ocaml -> OCAML_LANG
             SmPLCodeLang.Python -> PYTHON_LANG
         }

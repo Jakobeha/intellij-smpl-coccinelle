@@ -2013,106 +2013,106 @@ public class SmPLCParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // ['...' <<p>>*] <<p2>> ('...' <<p>>* <<p2>>)* ['...' <<p>>*]
-  static boolean optDotSeq(PsiBuilder b, int l, Parser _p, Parser _p2) {
+  // ['...' <<p2>>*] <<p>> ('...' <<p2>>* <<p>>)* ['...' <<p2>>*]
+  static boolean optDotSeq(PsiBuilder b, int l, Parser _p2, Parser _p) {
     if (!recursion_guard_(b, l, "optDotSeq")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = optDotSeq_0(b, l + 1, _p);
-    r = r && _p2.parse(b, l);
-    r = r && optDotSeq_2(b, l + 1, _p, _p2);
-    r = r && optDotSeq_3(b, l + 1, _p);
+    r = optDotSeq_0(b, l + 1, _p2);
+    r = r && _p.parse(b, l);
+    r = r && optDotSeq_2(b, l + 1, _p2, _p);
+    r = r && optDotSeq_3(b, l + 1, _p2);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // ['...' <<p>>*]
-  private static boolean optDotSeq_0(PsiBuilder b, int l, Parser _p) {
+  // ['...' <<p2>>*]
+  private static boolean optDotSeq_0(PsiBuilder b, int l, Parser _p2) {
     if (!recursion_guard_(b, l, "optDotSeq_0")) return false;
-    optDotSeq_0_0(b, l + 1, _p);
+    optDotSeq_0_0(b, l + 1, _p2);
     return true;
   }
 
-  // '...' <<p>>*
-  private static boolean optDotSeq_0_0(PsiBuilder b, int l, Parser _p) {
+  // '...' <<p2>>*
+  private static boolean optDotSeq_0_0(PsiBuilder b, int l, Parser _p2) {
     if (!recursion_guard_(b, l, "optDotSeq_0_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, ELLIPSIS);
-    r = r && optDotSeq_0_0_1(b, l + 1, _p);
+    r = r && optDotSeq_0_0_1(b, l + 1, _p2);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // <<p>>*
-  private static boolean optDotSeq_0_0_1(PsiBuilder b, int l, Parser _p) {
+  // <<p2>>*
+  private static boolean optDotSeq_0_0_1(PsiBuilder b, int l, Parser _p2) {
     if (!recursion_guard_(b, l, "optDotSeq_0_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!_p.parse(b, l)) break;
+      if (!_p2.parse(b, l)) break;
       if (!empty_element_parsed_guard_(b, "optDotSeq_0_0_1", c)) break;
     }
     return true;
   }
 
-  // ('...' <<p>>* <<p2>>)*
-  private static boolean optDotSeq_2(PsiBuilder b, int l, Parser _p, Parser _p2) {
+  // ('...' <<p2>>* <<p>>)*
+  private static boolean optDotSeq_2(PsiBuilder b, int l, Parser _p2, Parser _p) {
     if (!recursion_guard_(b, l, "optDotSeq_2")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!optDotSeq_2_0(b, l + 1, _p, _p2)) break;
+      if (!optDotSeq_2_0(b, l + 1, _p2, _p)) break;
       if (!empty_element_parsed_guard_(b, "optDotSeq_2", c)) break;
     }
     return true;
   }
 
-  // '...' <<p>>* <<p2>>
-  private static boolean optDotSeq_2_0(PsiBuilder b, int l, Parser _p, Parser _p2) {
+  // '...' <<p2>>* <<p>>
+  private static boolean optDotSeq_2_0(PsiBuilder b, int l, Parser _p2, Parser _p) {
     if (!recursion_guard_(b, l, "optDotSeq_2_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, ELLIPSIS);
-    r = r && optDotSeq_2_0_1(b, l + 1, _p);
-    r = r && _p2.parse(b, l);
+    r = r && optDotSeq_2_0_1(b, l + 1, _p2);
+    r = r && _p.parse(b, l);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // <<p>>*
-  private static boolean optDotSeq_2_0_1(PsiBuilder b, int l, Parser _p) {
+  // <<p2>>*
+  private static boolean optDotSeq_2_0_1(PsiBuilder b, int l, Parser _p2) {
     if (!recursion_guard_(b, l, "optDotSeq_2_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!_p.parse(b, l)) break;
+      if (!_p2.parse(b, l)) break;
       if (!empty_element_parsed_guard_(b, "optDotSeq_2_0_1", c)) break;
     }
     return true;
   }
 
-  // ['...' <<p>>*]
-  private static boolean optDotSeq_3(PsiBuilder b, int l, Parser _p) {
+  // ['...' <<p2>>*]
+  private static boolean optDotSeq_3(PsiBuilder b, int l, Parser _p2) {
     if (!recursion_guard_(b, l, "optDotSeq_3")) return false;
-    optDotSeq_3_0(b, l + 1, _p);
+    optDotSeq_3_0(b, l + 1, _p2);
     return true;
   }
 
-  // '...' <<p>>*
-  private static boolean optDotSeq_3_0(PsiBuilder b, int l, Parser _p) {
+  // '...' <<p2>>*
+  private static boolean optDotSeq_3_0(PsiBuilder b, int l, Parser _p2) {
     if (!recursion_guard_(b, l, "optDotSeq_3_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeToken(b, ELLIPSIS);
-    r = r && optDotSeq_3_0_1(b, l + 1, _p);
+    r = r && optDotSeq_3_0_1(b, l + 1, _p2);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  // <<p>>*
-  private static boolean optDotSeq_3_0_1(PsiBuilder b, int l, Parser _p) {
+  // <<p2>>*
+  private static boolean optDotSeq_3_0_1(PsiBuilder b, int l, Parser _p2) {
     if (!recursion_guard_(b, l, "optDotSeq_3_0_1")) return false;
     while (true) {
       int c = current_position_(b);
-      if (!_p.parse(b, l)) break;
+      if (!_p2.parse(b, l)) break;
       if (!empty_element_parsed_guard_(b, "optDotSeq_3_0_1", c)) break;
     }
     return true;

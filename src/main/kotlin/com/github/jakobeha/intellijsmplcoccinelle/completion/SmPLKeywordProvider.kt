@@ -82,8 +82,8 @@ class SmPLKeywordProvider : CompletionProvider<CompletionParameters?>() {
             "initialize:",
             "finalize:",
             // in language
-            // "ocaml",
-            // "python",
+            "ocaml",
+            "python",
         ).map { LookupElementBuilder.create(it) }.asIterable())
     }
 }

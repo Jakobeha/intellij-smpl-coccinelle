@@ -4,7 +4,6 @@ import com.github.jakobeha.intellijsmplcoccinelle.c.SmPLC
 import com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCDummyFile
 import com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCParser
 import com.github.jakobeha.intellijsmplcoccinelle.c.psi.SmPLCTypes
-import com.intellij.extapi.psi.ASTWrapperPsiElement
 import com.intellij.lang.ASTNode
 import com.intellij.lang.ParserDefinition
 import com.intellij.lang.PsiParser
@@ -27,9 +26,7 @@ class SmPLCParserDefinition : ParserDefinition {
     override fun getCommentTokens(): TokenSet = COMMENTS
     override fun getStringLiteralElements(): TokenSet = STRING_LITERALS
 
-    override fun createElement(node: ASTNode): PsiElement {
-        return ASTWrapperPsiElement(node)
-    }
+    override fun createElement(node: ASTNode): PsiElement = SmPLCTypes.Factory.createElement(node)
 
     override fun createFile(viewProvider: FileViewProvider): PsiFile {
         return SmPLCDummyFile(viewProvider)

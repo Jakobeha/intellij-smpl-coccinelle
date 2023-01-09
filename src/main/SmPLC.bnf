@@ -77,7 +77,7 @@
         concat='##'
         // Reserved IDs. Should be tokens for IntelliJ reasons. Gives us a nicer
         // PSI tree as side effect.
-        ATTRIBUTE='__attribute__'
+        ATTRIBUTE_HEAD='__attribute__'
         WHEN='when'
         ANY='any'
         STRICT='strict'
@@ -150,24 +150,25 @@
     extends(".*type")=expr
 }
 
-transformation ::= include+ | <<optDotSeq top when>>
+transformation ::= include+ | <<optDotSeq top when_cond>>
 
 include ::= '#include' STRING
 top ::= expr |
     decl_stmt+ |
     fundecl
-when ::=
+when_cond ::= 'when' when_cond_ {pin=1}
+private when_cond_ ::=
     when_ne |
     when_eq |
     when_any |
     when_true_ne |
     when_false_ne
-when_ne ::= 'when' '!=' when_code {pin=2}
-when_eq ::= 'when' '=' rule_elem_stmt {pin=2}
-when_any ::= 'when' <<commaSeparate any_strict>>
-when_true_ne ::= 'when' 'true' '!=' expr {pin=2}
-when_false_ne ::= 'when' 'false' '!=' expr {pin=2}
-when_code ::= <<optDotSeq decl_stmt+ when>> | <<optDotSeq expr when>>
+when_ne ::= '!=' when_code {pin=1}
+when_eq ::= '=' rule_elem_stmt {pin=1}
+when_any ::= <<commaSeparate any_strict>>
+when_true_ne ::= 'true' '!=' expr {pin=1}
+when_false_ne ::= 'false' '!=' expr {pin=1}
+when_code ::= <<optDotSeq decl_stmt+ when_cond>> | <<optDotSeq expr when_cond>>
 rule_elem_stmt ::= single_rule_elem_stmt | multi_rule_elem_stmt
 single_rule_elem_stmt ::= single_rule_elem_stmt_ ';' {pin=1}
 private single_rule_elem_stmt_ ::=
@@ -289,8 +290,8 @@ stmt_break ::= 'break' ';' {pin=1}
 stmt_continue ::= 'continue' ';' {pin=1}
 stmt_label ::= id ':'
 stmt_goto ::= 'goto' id {pin=1}
-stmt_nest_decl ::= <<nest decl_stmt+ when>>
-stmt_nest_expr ::= <<nest expr when>>
+stmt_nest_decl ::= <<nest decl_stmt+ when_cond>>
+stmt_nest_expr ::= <<nest expr when_cond>>
 directive ::=
     include |
     define |
@@ -312,7 +313,7 @@ decl_stmt ::=
     <<conjunct stmt_seq>> |
     <<disjunct stmt_seq>>
 stmt_seq ::=
-    decl_stmt* [<<dotSeq (decl_stmt+ | expr) when>> decl_stmt*]
+    decl_stmt* [<<dotSeq (decl_stmt+ | expr) when_cond>> decl_stmt*]
 case_line ::= case_line_default | case_line_case
 case_line_default ::= 'default' ':' stmt_seq {pin=1}
 case_line_case ::= 'case' dot_expr ':' stmt_seq {pin=1}
@@ -338,7 +339,7 @@ meta expr_head ::=
     '(' type ')' <<p>> |
     id |
     '(' type ')' '{' <<commaSeparate init_list_elem>> '}' |
-    const |
+    constant |
     '(' dot_expr ')' |
     <<conjunct <<p>>>>
     <<disjunct <<p>>>>
@@ -361,7 +362,7 @@ assign_op ::= '=' | '-=' | '+=' | '*=' | '/=' | '%=' | '&=' | '|=' | '^=' | '<<=
 bin_op ::= '*' | '/' | '%' | '+' | '-' | '<<' | '>>' | '^' | '&' | '|' | '<' | '>' | '<=' | '>=' | '==' | '!=' | '&&' | '||'
 unary_op ::= '++' | '--' | '&' | '*' | '+' | '-' | '!'
 
-const ::= STRING | INTEGER | '...'
+constant ::= STRING | INTEGER | '...'
 id ::= WORD | <<conjunct WORD>> | <<disjunct WORD>>
 typedef_ident ::= id
 type ::= ctype | WORD

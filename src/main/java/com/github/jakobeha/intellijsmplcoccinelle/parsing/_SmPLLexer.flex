@@ -1,7 +1,8 @@
 /* MODIFIED from generated SmPL.bnf lexer. Do not replace */
 package com.github.jakobeha.intellijsmplcoccinelle.parsing;
 
-import com.github.jakobeha.intellijsmplcoccinelle.injection.SmPLCodeLang;import com.intellij.lexer.FlexLexer;
+import com.github.jakobeha.intellijsmplcoccinelle.injection.SmPLCodeLang;
+import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 
 import static com.intellij.psi.TokenType.BAD_CHARACTER;
@@ -39,9 +40,9 @@ import static com.github.jakobeha.intellijsmplcoccinelle.psi.SmPLTypes.*;
 
 WHITE_SPACE=\s+
 
-LINE_COMMENT="//"([^/][^\R]*)?
+LINE_COMMENT="//"([^/].*)?
 BLOCK_COMMENT="/"\*[^*]([^*]|\*[^/])*\*"/" | "/**/"
-DOC_COMMENT="///"[^\R]*|"/"\*\*([^*]|\*[^/])*\*"/"
+DOC_COMMENT="///".*|"/"\*\*([^*]|\*[^/])*\*"/"
 
 DIGITS=[0-9]+
 WORD=[a-zA-Z_][a-zA-Z0-9_]*

@@ -19,6 +19,7 @@ usage() {
 # Names without extensions, this way we can add .java or .flex as needed.
 names=(
 src/main/java/com/github/jakobeha/intellijsmplcoccinelle/parsing/_SmPLLexer
+src/main/java/com/github/jakobeha/intellijsmplcoccinelle/c/parsing/_SmPLCLexer
 )
 
 main() {

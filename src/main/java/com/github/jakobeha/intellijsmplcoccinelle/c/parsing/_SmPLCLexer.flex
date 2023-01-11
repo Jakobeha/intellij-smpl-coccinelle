@@ -35,6 +35,8 @@ STRING=\"[^\"]*\"
 
 %%
 <YYINITIAL> {
+  "@@"                  { return DOUBLE_AT; }
+  "@"                   { return AT; }
   "<..."                { return NEST_REG_OPEN; }
   "...>"                { return NEST_REG_CLOSE; }
   "<+..."               { return NEST_PLUS_OPEN; }
@@ -44,6 +46,7 @@ STRING=\"[^\"]*\"
   "\\("                 { return BACK_LPAREN; }
   "\\)"                 { return BACK_RPAREN; }
   "\\|"                 { return BACK_OR; }
+  "\\&"                 { return BACK_AND; }
   "("                   { return LPAREN; }
   ")"                   { return RPAREN; }
   "["                   { return LBRACK; }

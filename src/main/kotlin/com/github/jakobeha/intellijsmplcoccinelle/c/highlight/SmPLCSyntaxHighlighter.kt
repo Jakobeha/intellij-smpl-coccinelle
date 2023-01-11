@@ -85,12 +85,14 @@ class SmPLCSyntaxHighlighter : SyntaxHighlighterBase() {
                 SmPLCTypes.XOR_EQUALS,
                 SmPLCTypes.AND_EQUALS,
                 SmPLCTypes.OR_EQUALS,
+                SmPLCTypes.BACK_OR,
+                SmPLCTypes.BACK_AND,
             )
 
             keysPutEach(DOT, SmPLCTypes.DOT)
             keysPutEach(COMMA, SmPLCTypes.COMMA)
             keysPutEach(SEMICOLON, SmPLCTypes.SEMICOLON)
-            keysPutEach(PARENTHESES, SmPLCTypes.LPAREN, SmPLCTypes.RPAREN)
+            keysPutEach(PARENTHESES, SmPLCTypes.LPAREN, SmPLCTypes.RPAREN, SmPLCTypes.BACK_LPAREN, SmPLCTypes.BACK_RPAREN)
             keysPutEach(BRACKETS, SmPLCTypes.LBRACK, SmPLCTypes.RBRACK)
             keysPutEach(BRACES, SmPLCTypes.LBRACE, SmPLCTypes.RBRACE)
             keysPutEach(LINE_COMMENT, SmPLCTypes.LINE_COMMENT)
